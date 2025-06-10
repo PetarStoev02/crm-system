@@ -1,25 +1,21 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
-  IconBook,
-  IconBrain,
   IconCommand,
-  IconLifebuoy,
-  IconSend,
   IconSettings,
-  IconTerminal,
-} from "@tabler/icons-react"
-import {
-  Frame,
-  Map,
-  PieChart,
-} from "lucide-react"
+  IconChartBar,
+  IconCalendar,
+  IconUsers,
+  IconMessage,
+  IconChartPie,
+  IconTarget,
+  IconLayoutDashboard,
+} from "@tabler/icons-react";
 
-import { NavMain } from "@/widgets/nav-main"
-import { NavProjects } from "@/widgets/nav-projects"
-import { NavSecondary } from "@/widgets/nav-secondary"
-import { NavUser } from "@/widgets/nav-user"
+import { NavMain } from "@/widgets/nav-main";
+import { NavSecondary } from "@/widgets/nav-secondary";
+import { NavUser } from "@/widgets/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -28,7 +24,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/shared/ui/sidebar"
+} from "@/shared/ui/sidebar";
 
 const data = {
   user: {
@@ -38,121 +34,50 @@ const data = {
   },
   navMain: [
     {
-      title: "Playground",
-      url: "#",
-      icon: IconTerminal,
+      title: "Dashboard",
+      url: "/",
+      icon: IconLayoutDashboard,
       isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
     },
     {
-      title: "Models",
-      url: "#",
-      icon: IconBrain,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
+      title: "Leads Management",
+      url: "/leads",
+      icon: IconTarget,
     },
     {
-      title: "Documentation",
-      url: "#",
-      icon: IconBook,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
+      title: "Campaign Management",
+      url: "/campaigns",
+      icon: IconChartBar,
     },
     {
-      title: "Settings",
-      url: "#",
-      icon: IconSettings,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
+      title: "Task & Calendar",
+      url: "/tasks",
+      icon: IconCalendar,
+    },
+    {
+      title: "Client Management",
+      url: "/clients",
+      icon: IconUsers,
+    },
+    {
+      title: "Communication Hub",
+      url: "/communication",
+      icon: IconMessage,
+    },
+    {
+      title: "Reports & Analytics",
+      url: "/reports",
+      icon: IconChartPie,
     },
   ],
   navSecondary: [
     {
-      title: "Support",
-      url: "#",
-      icon: IconLifebuoy,
-    },
-    {
-      title: "Feedback",
-      url: "#",
-      icon: IconSend,
+      title: "Settings",
+      url: "/settings",
+      icon: IconSettings,
     },
   ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -166,7 +91,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <IconCommand className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Acme Inc</span>
+                  <span className="truncate font-medium">CRM System</span>
                   <span className="truncate text-xs">Enterprise</span>
                 </div>
               </a>
@@ -176,12 +101,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

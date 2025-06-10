@@ -1,9 +1,6 @@
-import { createRoute } from "@tanstack/react-router"
-import { authedRoute } from "../_authed"
 import { DashboardPage } from "@/pages/dashboard"
+import { createFileRoute } from "@tanstack/react-router"
 
-export const dashboardRoute = createRoute({
-  getParentRoute: () => authedRoute,
-  path: "/",
+export const dashboardRoute = createFileRoute("")({
   component: DashboardPage,
 }) 
