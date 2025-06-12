@@ -8,10 +8,13 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import type { CreateFileRoute, FileRoutesByPath } from '@tanstack/react-router'
+
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as LeadsRouteImport } from './routes/leads'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CommunicationRouteImport } from './routes/communication'
 import { Route as ClientsRouteImport } from './routes/clients'
 import { Route as CampaignsRouteImport } from './routes/campaigns'
@@ -30,6 +33,11 @@ const ReportsRoute = ReportsRouteImport.update({
 const LeadsRoute = LeadsRouteImport.update({
   id: '/leads',
   path: '/leads',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CommunicationRoute = CommunicationRouteImport.update({
@@ -58,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/campaigns': typeof CampaignsRoute
   '/clients': typeof ClientsRoute
   '/communication': typeof CommunicationRoute
+  '/dashboard': typeof DashboardRoute
   '/leads': typeof LeadsRoute
   '/reports': typeof ReportsRoute
   '/tasks': typeof TasksRoute
@@ -67,6 +76,7 @@ export interface FileRoutesByTo {
   '/campaigns': typeof CampaignsRoute
   '/clients': typeof ClientsRoute
   '/communication': typeof CommunicationRoute
+  '/dashboard': typeof DashboardRoute
   '/leads': typeof LeadsRoute
   '/reports': typeof ReportsRoute
   '/tasks': typeof TasksRoute
@@ -77,6 +87,7 @@ export interface FileRoutesById {
   '/campaigns': typeof CampaignsRoute
   '/clients': typeof ClientsRoute
   '/communication': typeof CommunicationRoute
+  '/dashboard': typeof DashboardRoute
   '/leads': typeof LeadsRoute
   '/reports': typeof ReportsRoute
   '/tasks': typeof TasksRoute
@@ -88,6 +99,7 @@ export interface FileRouteTypes {
     | '/campaigns'
     | '/clients'
     | '/communication'
+    | '/dashboard'
     | '/leads'
     | '/reports'
     | '/tasks'
@@ -97,6 +109,7 @@ export interface FileRouteTypes {
     | '/campaigns'
     | '/clients'
     | '/communication'
+    | '/dashboard'
     | '/leads'
     | '/reports'
     | '/tasks'
@@ -106,6 +119,7 @@ export interface FileRouteTypes {
     | '/campaigns'
     | '/clients'
     | '/communication'
+    | '/dashboard'
     | '/leads'
     | '/reports'
     | '/tasks'
@@ -116,6 +130,7 @@ export interface RootRouteChildren {
   CampaignsRoute: typeof CampaignsRoute
   ClientsRoute: typeof ClientsRoute
   CommunicationRoute: typeof CommunicationRoute
+  DashboardRoute: typeof DashboardRoute
   LeadsRoute: typeof LeadsRoute
   ReportsRoute: typeof ReportsRoute
   TasksRoute: typeof TasksRoute
@@ -123,39 +138,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/tasks': {
-      id: '/tasks'
-      path: '/tasks'
-      fullPath: '/tasks'
-      preLoaderRoute: typeof TasksRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reports': {
-      id: '/reports'
-      path: '/reports'
-      fullPath: '/reports'
-      preLoaderRoute: typeof ReportsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/leads': {
-      id: '/leads'
-      path: '/leads'
-      fullPath: '/leads'
-      preLoaderRoute: typeof LeadsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/communication': {
-      id: '/communication'
-      path: '/communication'
-      fullPath: '/communication'
-      preLoaderRoute: typeof CommunicationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/clients': {
-      id: '/clients'
-      path: '/clients'
-      fullPath: '/clients'
-      preLoaderRoute: typeof ClientsRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/campaigns': {
@@ -165,14 +152,122 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CampaignsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/clients': {
+      id: '/clients'
+      path: '/clients'
+      fullPath: '/clients'
+      preLoaderRoute: typeof ClientsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/communication': {
+      id: '/communication'
+      path: '/communication'
+      fullPath: '/communication'
+      preLoaderRoute: typeof CommunicationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leads': {
+      id: '/leads'
+      path: '/leads'
+      fullPath: '/leads'
+      preLoaderRoute: typeof LeadsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reports': {
+      id: '/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof ReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tasks': {
+      id: '/tasks'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof TasksRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
+}
+
+declare module './routes/index' {
+  const createFileRoute: CreateFileRoute<
+    '/',
+    FileRoutesByPath['/']['parentRoute'],
+    FileRoutesByPath['/']['id'],
+    FileRoutesByPath['/']['path'],
+    FileRoutesByPath['/']['fullPath']
+  >
+}
+declare module './routes/campaigns' {
+  const createFileRoute: CreateFileRoute<
+    '/campaigns',
+    FileRoutesByPath['/campaigns']['parentRoute'],
+    FileRoutesByPath['/campaigns']['id'],
+    FileRoutesByPath['/campaigns']['path'],
+    FileRoutesByPath['/campaigns']['fullPath']
+  >
+}
+declare module './routes/clients' {
+  const createFileRoute: CreateFileRoute<
+    '/clients',
+    FileRoutesByPath['/clients']['parentRoute'],
+    FileRoutesByPath['/clients']['id'],
+    FileRoutesByPath['/clients']['path'],
+    FileRoutesByPath['/clients']['fullPath']
+  >
+}
+declare module './routes/communication' {
+  const createFileRoute: CreateFileRoute<
+    '/communication',
+    FileRoutesByPath['/communication']['parentRoute'],
+    FileRoutesByPath['/communication']['id'],
+    FileRoutesByPath['/communication']['path'],
+    FileRoutesByPath['/communication']['fullPath']
+  >
+}
+declare module './routes/dashboard' {
+  const createFileRoute: CreateFileRoute<
+    '/dashboard',
+    FileRoutesByPath['/dashboard']['parentRoute'],
+    FileRoutesByPath['/dashboard']['id'],
+    FileRoutesByPath['/dashboard']['path'],
+    FileRoutesByPath['/dashboard']['fullPath']
+  >
+}
+declare module './routes/leads' {
+  const createFileRoute: CreateFileRoute<
+    '/leads',
+    FileRoutesByPath['/leads']['parentRoute'],
+    FileRoutesByPath['/leads']['id'],
+    FileRoutesByPath['/leads']['path'],
+    FileRoutesByPath['/leads']['fullPath']
+  >
+}
+declare module './routes/reports' {
+  const createFileRoute: CreateFileRoute<
+    '/reports',
+    FileRoutesByPath['/reports']['parentRoute'],
+    FileRoutesByPath['/reports']['id'],
+    FileRoutesByPath['/reports']['path'],
+    FileRoutesByPath['/reports']['fullPath']
+  >
+}
+declare module './routes/tasks' {
+  const createFileRoute: CreateFileRoute<
+    '/tasks',
+    FileRoutesByPath['/tasks']['parentRoute'],
+    FileRoutesByPath['/tasks']['id'],
+    FileRoutesByPath['/tasks']['path'],
+    FileRoutesByPath['/tasks']['fullPath']
+  >
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -180,6 +275,7 @@ const rootRouteChildren: RootRouteChildren = {
   CampaignsRoute: CampaignsRoute,
   ClientsRoute: ClientsRoute,
   CommunicationRoute: CommunicationRoute,
+  DashboardRoute: DashboardRoute,
   LeadsRoute: LeadsRoute,
   ReportsRoute: ReportsRoute,
   TasksRoute: TasksRoute,
