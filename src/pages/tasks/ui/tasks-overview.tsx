@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Users, ListChecks, CheckCircle2, AlertCircle, CalendarDays, Plus } from "lucide-react";
+import { Users, ListChecks, CheckCircle2, AlertCircle, Plus } from "lucide-react";
 
 export function TasksOverview() {
   return (

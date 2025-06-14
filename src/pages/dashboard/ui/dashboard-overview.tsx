@@ -1,5 +1,4 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Users, Megaphone, Percent, DollarSign } from "lucide-react";
 
 export const DashboardOverview = () => {

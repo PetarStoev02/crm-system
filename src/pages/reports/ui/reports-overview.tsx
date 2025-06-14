@@ -1,8 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart2, TrendingUp, TrendingDown, Heart, DollarSign, Filter, Table } from "lucide-react";
+import { BarChart2, TrendingUp, TrendingDown, Heart, DollarSign } from "lucide-react";
 
 export function ReportsOverview() {
   return (
