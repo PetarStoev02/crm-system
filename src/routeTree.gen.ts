@@ -11,49 +11,34 @@
 import type { CreateFileRoute, FileRoutesByPath } from '@tanstack/react-router'
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TasksRouteImport } from './routes/tasks'
-import { Route as ReportsRouteImport } from './routes/reports'
-import { Route as LeadsRouteImport } from './routes/leads'
-import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as CommunicationRouteImport } from './routes/communication'
-import { Route as ClientsRouteImport } from './routes/clients'
-import { Route as CampaignsRouteImport } from './routes/campaigns'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthedRouteImport } from './routes/authed'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthedIndexRouteImport } from './routes/authed/index'
 import { Route as SettingsAccountSettingsRouteImport } from './routes/settings/account-settings'
+import { Route as AuthedTasksRouteImport } from './routes/authed/tasks'
+import { Route as AuthedReportsRouteImport } from './routes/authed/reports'
+import { Route as AuthedLeadsRouteImport } from './routes/authed/leads'
+import { Route as AuthedDashboardRouteImport } from './routes/authed/dashboard'
+import { Route as AuthedCommunicationRouteImport } from './routes/authed/communication'
+import { Route as AuthedClientsRouteImport } from './routes/authed/clients'
+import { Route as AuthedCampaignsRouteImport } from './routes/authed/campaigns'
+import { Route as AuthedSettingsAccountSettingsRouteImport } from './routes/authed/settings/account-settings'
 
-const TasksRoute = TasksRouteImport.update({
-  id: '/tasks',
-  path: '/tasks',
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ReportsRoute = ReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LeadsRoute = LeadsRouteImport.update({
-  id: '/leads',
-  path: '/leads',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CommunicationRoute = CommunicationRouteImport.update({
-  id: '/communication',
-  path: '/communication',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ClientsRoute = ClientsRouteImport.update({
-  id: '/clients',
-  path: '/clients',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CampaignsRoute = CampaignsRouteImport.update({
-  id: '/campaigns',
-  path: '/campaigns',
+const AuthedRoute = AuthedRouteImport.update({
+  id: '/authed',
+  path: '/authed',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -61,91 +46,161 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthedIndexRoute = AuthedIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const SettingsAccountSettingsRoute = SettingsAccountSettingsRouteImport.update({
   id: '/settings/account-settings',
   path: '/settings/account-settings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthedTasksRoute = AuthedTasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedReportsRoute = AuthedReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedLeadsRoute = AuthedLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedCommunicationRoute = AuthedCommunicationRouteImport.update({
+  id: '/communication',
+  path: '/communication',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedClientsRoute = AuthedClientsRouteImport.update({
+  id: '/clients',
+  path: '/clients',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedCampaignsRoute = AuthedCampaignsRouteImport.update({
+  id: '/campaigns',
+  path: '/campaigns',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedSettingsAccountSettingsRoute =
+  AuthedSettingsAccountSettingsRouteImport.update({
+    id: '/settings/account-settings',
+    path: '/settings/account-settings',
+    getParentRoute: () => AuthedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/campaigns': typeof CampaignsRoute
-  '/clients': typeof ClientsRoute
-  '/communication': typeof CommunicationRoute
-  '/dashboard': typeof DashboardRoute
-  '/leads': typeof LeadsRoute
-  '/reports': typeof ReportsRoute
-  '/tasks': typeof TasksRoute
+  '/authed': typeof AuthedRouteWithChildren
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/authed/campaigns': typeof AuthedCampaignsRoute
+  '/authed/clients': typeof AuthedClientsRoute
+  '/authed/communication': typeof AuthedCommunicationRoute
+  '/authed/dashboard': typeof AuthedDashboardRoute
+  '/authed/leads': typeof AuthedLeadsRoute
+  '/authed/reports': typeof AuthedReportsRoute
+  '/authed/tasks': typeof AuthedTasksRoute
   '/settings/account-settings': typeof SettingsAccountSettingsRoute
+  '/authed/': typeof AuthedIndexRoute
+  '/authed/settings/account-settings': typeof AuthedSettingsAccountSettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/campaigns': typeof CampaignsRoute
-  '/clients': typeof ClientsRoute
-  '/communication': typeof CommunicationRoute
-  '/dashboard': typeof DashboardRoute
-  '/leads': typeof LeadsRoute
-  '/reports': typeof ReportsRoute
-  '/tasks': typeof TasksRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/authed/campaigns': typeof AuthedCampaignsRoute
+  '/authed/clients': typeof AuthedClientsRoute
+  '/authed/communication': typeof AuthedCommunicationRoute
+  '/authed/dashboard': typeof AuthedDashboardRoute
+  '/authed/leads': typeof AuthedLeadsRoute
+  '/authed/reports': typeof AuthedReportsRoute
+  '/authed/tasks': typeof AuthedTasksRoute
   '/settings/account-settings': typeof SettingsAccountSettingsRoute
+  '/authed': typeof AuthedIndexRoute
+  '/authed/settings/account-settings': typeof AuthedSettingsAccountSettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/campaigns': typeof CampaignsRoute
-  '/clients': typeof ClientsRoute
-  '/communication': typeof CommunicationRoute
-  '/dashboard': typeof DashboardRoute
-  '/leads': typeof LeadsRoute
-  '/reports': typeof ReportsRoute
-  '/tasks': typeof TasksRoute
+  '/authed': typeof AuthedRouteWithChildren
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/authed/campaigns': typeof AuthedCampaignsRoute
+  '/authed/clients': typeof AuthedClientsRoute
+  '/authed/communication': typeof AuthedCommunicationRoute
+  '/authed/dashboard': typeof AuthedDashboardRoute
+  '/authed/leads': typeof AuthedLeadsRoute
+  '/authed/reports': typeof AuthedReportsRoute
+  '/authed/tasks': typeof AuthedTasksRoute
   '/settings/account-settings': typeof SettingsAccountSettingsRoute
+  '/authed/': typeof AuthedIndexRoute
+  '/authed/settings/account-settings': typeof AuthedSettingsAccountSettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/campaigns'
-    | '/clients'
-    | '/communication'
-    | '/dashboard'
-    | '/leads'
-    | '/reports'
-    | '/tasks'
+    | '/authed'
+    | '/login'
+    | '/register'
+    | '/authed/campaigns'
+    | '/authed/clients'
+    | '/authed/communication'
+    | '/authed/dashboard'
+    | '/authed/leads'
+    | '/authed/reports'
+    | '/authed/tasks'
     | '/settings/account-settings'
+    | '/authed/'
+    | '/authed/settings/account-settings'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/campaigns'
-    | '/clients'
-    | '/communication'
-    | '/dashboard'
-    | '/leads'
-    | '/reports'
-    | '/tasks'
+    | '/login'
+    | '/register'
+    | '/authed/campaigns'
+    | '/authed/clients'
+    | '/authed/communication'
+    | '/authed/dashboard'
+    | '/authed/leads'
+    | '/authed/reports'
+    | '/authed/tasks'
     | '/settings/account-settings'
+    | '/authed'
+    | '/authed/settings/account-settings'
   id:
     | '__root__'
     | '/'
-    | '/campaigns'
-    | '/clients'
-    | '/communication'
-    | '/dashboard'
-    | '/leads'
-    | '/reports'
-    | '/tasks'
+    | '/authed'
+    | '/login'
+    | '/register'
+    | '/authed/campaigns'
+    | '/authed/clients'
+    | '/authed/communication'
+    | '/authed/dashboard'
+    | '/authed/leads'
+    | '/authed/reports'
+    | '/authed/tasks'
     | '/settings/account-settings'
+    | '/authed/'
+    | '/authed/settings/account-settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CampaignsRoute: typeof CampaignsRoute
-  ClientsRoute: typeof ClientsRoute
-  CommunicationRoute: typeof CommunicationRoute
-  DashboardRoute: typeof DashboardRoute
-  LeadsRoute: typeof LeadsRoute
-  ReportsRoute: typeof ReportsRoute
-  TasksRoute: typeof TasksRoute
+  AuthedRoute: typeof AuthedRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  RegisterRoute: typeof RegisterRoute
   SettingsAccountSettingsRoute: typeof SettingsAccountSettingsRoute
 }
 
@@ -158,54 +213,75 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/campaigns': {
-      id: '/campaigns'
+    '/authed': {
+      id: '/authed'
+      path: '/authed'
+      fullPath: '/authed'
+      preLoaderRoute: typeof AuthedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/authed/campaigns': {
+      id: '/authed/campaigns'
       path: '/campaigns'
-      fullPath: '/campaigns'
-      preLoaderRoute: typeof CampaignsRouteImport
-      parentRoute: typeof rootRouteImport
+      fullPath: '/authed/campaigns'
+      preLoaderRoute: typeof AuthedCampaignsRouteImport
+      parentRoute: typeof AuthedRoute
     }
-    '/clients': {
-      id: '/clients'
+    '/authed/clients': {
+      id: '/authed/clients'
       path: '/clients'
-      fullPath: '/clients'
-      preLoaderRoute: typeof ClientsRouteImport
-      parentRoute: typeof rootRouteImport
+      fullPath: '/authed/clients'
+      preLoaderRoute: typeof AuthedClientsRouteImport
+      parentRoute: typeof AuthedRoute
     }
-    '/communication': {
-      id: '/communication'
+    '/authed/communication': {
+      id: '/authed/communication'
       path: '/communication'
-      fullPath: '/communication'
-      preLoaderRoute: typeof CommunicationRouteImport
-      parentRoute: typeof rootRouteImport
+      fullPath: '/authed/communication'
+      preLoaderRoute: typeof AuthedCommunicationRouteImport
+      parentRoute: typeof AuthedRoute
     }
-    '/dashboard': {
-      id: '/dashboard'
+    '/authed/dashboard': {
+      id: '/authed/dashboard'
       path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
+      fullPath: '/authed/dashboard'
+      preLoaderRoute: typeof AuthedDashboardRouteImport
+      parentRoute: typeof AuthedRoute
     }
-    '/leads': {
-      id: '/leads'
+    '/authed/leads': {
+      id: '/authed/leads'
       path: '/leads'
-      fullPath: '/leads'
-      preLoaderRoute: typeof LeadsRouteImport
-      parentRoute: typeof rootRouteImport
+      fullPath: '/authed/leads'
+      preLoaderRoute: typeof AuthedLeadsRouteImport
+      parentRoute: typeof AuthedRoute
     }
-    '/reports': {
-      id: '/reports'
+    '/authed/reports': {
+      id: '/authed/reports'
       path: '/reports'
-      fullPath: '/reports'
-      preLoaderRoute: typeof ReportsRouteImport
-      parentRoute: typeof rootRouteImport
+      fullPath: '/authed/reports'
+      preLoaderRoute: typeof AuthedReportsRouteImport
+      parentRoute: typeof AuthedRoute
     }
-    '/tasks': {
-      id: '/tasks'
+    '/authed/tasks': {
+      id: '/authed/tasks'
       path: '/tasks'
-      fullPath: '/tasks'
-      preLoaderRoute: typeof TasksRouteImport
-      parentRoute: typeof rootRouteImport
+      fullPath: '/authed/tasks'
+      preLoaderRoute: typeof AuthedTasksRouteImport
+      parentRoute: typeof AuthedRoute
     }
     '/settings/account-settings': {
       id: '/settings/account-settings'
@@ -213,6 +289,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/settings/account-settings'
       preLoaderRoute: typeof SettingsAccountSettingsRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/authed/': {
+      id: '/authed/'
+      path: '/'
+      fullPath: '/authed/'
+      preLoaderRoute: typeof AuthedIndexRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/authed/settings/account-settings': {
+      id: '/authed/settings/account-settings'
+      path: '/settings/account-settings'
+      fullPath: '/authed/settings/account-settings'
+      preLoaderRoute: typeof AuthedSettingsAccountSettingsRouteImport
+      parentRoute: typeof AuthedRoute
     }
   }
 }
@@ -226,67 +316,94 @@ declare module './routes/index' {
     FileRoutesByPath['/']['fullPath']
   >
 }
-declare module './routes/campaigns' {
+declare module './routes/authed' {
   const createFileRoute: CreateFileRoute<
-    '/campaigns',
-    FileRoutesByPath['/campaigns']['parentRoute'],
-    FileRoutesByPath['/campaigns']['id'],
-    FileRoutesByPath['/campaigns']['path'],
-    FileRoutesByPath['/campaigns']['fullPath']
+    '/authed',
+    FileRoutesByPath['/authed']['parentRoute'],
+    FileRoutesByPath['/authed']['id'],
+    FileRoutesByPath['/authed']['path'],
+    FileRoutesByPath['/authed']['fullPath']
   >
 }
-declare module './routes/clients' {
+declare module './routes/login' {
   const createFileRoute: CreateFileRoute<
-    '/clients',
-    FileRoutesByPath['/clients']['parentRoute'],
-    FileRoutesByPath['/clients']['id'],
-    FileRoutesByPath['/clients']['path'],
-    FileRoutesByPath['/clients']['fullPath']
+    '/login',
+    FileRoutesByPath['/login']['parentRoute'],
+    FileRoutesByPath['/login']['id'],
+    FileRoutesByPath['/login']['path'],
+    FileRoutesByPath['/login']['fullPath']
   >
 }
-declare module './routes/communication' {
+declare module './routes/register' {
   const createFileRoute: CreateFileRoute<
-    '/communication',
-    FileRoutesByPath['/communication']['parentRoute'],
-    FileRoutesByPath['/communication']['id'],
-    FileRoutesByPath['/communication']['path'],
-    FileRoutesByPath['/communication']['fullPath']
+    '/register',
+    FileRoutesByPath['/register']['parentRoute'],
+    FileRoutesByPath['/register']['id'],
+    FileRoutesByPath['/register']['path'],
+    FileRoutesByPath['/register']['fullPath']
   >
 }
-declare module './routes/dashboard' {
+declare module './routes/authed/campaigns' {
   const createFileRoute: CreateFileRoute<
-    '/dashboard',
-    FileRoutesByPath['/dashboard']['parentRoute'],
-    FileRoutesByPath['/dashboard']['id'],
-    FileRoutesByPath['/dashboard']['path'],
-    FileRoutesByPath['/dashboard']['fullPath']
+    '/authed/campaigns',
+    FileRoutesByPath['/authed/campaigns']['parentRoute'],
+    FileRoutesByPath['/authed/campaigns']['id'],
+    FileRoutesByPath['/authed/campaigns']['path'],
+    FileRoutesByPath['/authed/campaigns']['fullPath']
   >
 }
-declare module './routes/leads' {
+declare module './routes/authed/clients' {
   const createFileRoute: CreateFileRoute<
-    '/leads',
-    FileRoutesByPath['/leads']['parentRoute'],
-    FileRoutesByPath['/leads']['id'],
-    FileRoutesByPath['/leads']['path'],
-    FileRoutesByPath['/leads']['fullPath']
+    '/authed/clients',
+    FileRoutesByPath['/authed/clients']['parentRoute'],
+    FileRoutesByPath['/authed/clients']['id'],
+    FileRoutesByPath['/authed/clients']['path'],
+    FileRoutesByPath['/authed/clients']['fullPath']
   >
 }
-declare module './routes/reports' {
+declare module './routes/authed/communication' {
   const createFileRoute: CreateFileRoute<
-    '/reports',
-    FileRoutesByPath['/reports']['parentRoute'],
-    FileRoutesByPath['/reports']['id'],
-    FileRoutesByPath['/reports']['path'],
-    FileRoutesByPath['/reports']['fullPath']
+    '/authed/communication',
+    FileRoutesByPath['/authed/communication']['parentRoute'],
+    FileRoutesByPath['/authed/communication']['id'],
+    FileRoutesByPath['/authed/communication']['path'],
+    FileRoutesByPath['/authed/communication']['fullPath']
   >
 }
-declare module './routes/tasks' {
+declare module './routes/authed/dashboard' {
   const createFileRoute: CreateFileRoute<
-    '/tasks',
-    FileRoutesByPath['/tasks']['parentRoute'],
-    FileRoutesByPath['/tasks']['id'],
-    FileRoutesByPath['/tasks']['path'],
-    FileRoutesByPath['/tasks']['fullPath']
+    '/authed/dashboard',
+    FileRoutesByPath['/authed/dashboard']['parentRoute'],
+    FileRoutesByPath['/authed/dashboard']['id'],
+    FileRoutesByPath['/authed/dashboard']['path'],
+    FileRoutesByPath['/authed/dashboard']['fullPath']
+  >
+}
+declare module './routes/authed/leads' {
+  const createFileRoute: CreateFileRoute<
+    '/authed/leads',
+    FileRoutesByPath['/authed/leads']['parentRoute'],
+    FileRoutesByPath['/authed/leads']['id'],
+    FileRoutesByPath['/authed/leads']['path'],
+    FileRoutesByPath['/authed/leads']['fullPath']
+  >
+}
+declare module './routes/authed/reports' {
+  const createFileRoute: CreateFileRoute<
+    '/authed/reports',
+    FileRoutesByPath['/authed/reports']['parentRoute'],
+    FileRoutesByPath['/authed/reports']['id'],
+    FileRoutesByPath['/authed/reports']['path'],
+    FileRoutesByPath['/authed/reports']['fullPath']
+  >
+}
+declare module './routes/authed/tasks' {
+  const createFileRoute: CreateFileRoute<
+    '/authed/tasks',
+    FileRoutesByPath['/authed/tasks']['parentRoute'],
+    FileRoutesByPath['/authed/tasks']['id'],
+    FileRoutesByPath['/authed/tasks']['path'],
+    FileRoutesByPath['/authed/tasks']['fullPath']
   >
 }
 declare module './routes/settings/account-settings' {
@@ -298,16 +415,57 @@ declare module './routes/settings/account-settings' {
     FileRoutesByPath['/settings/account-settings']['fullPath']
   >
 }
+declare module './routes/authed/index' {
+  const createFileRoute: CreateFileRoute<
+    '/authed/',
+    FileRoutesByPath['/authed/']['parentRoute'],
+    FileRoutesByPath['/authed/']['id'],
+    FileRoutesByPath['/authed/']['path'],
+    FileRoutesByPath['/authed/']['fullPath']
+  >
+}
+declare module './routes/authed/settings/account-settings' {
+  const createFileRoute: CreateFileRoute<
+    '/authed/settings/account-settings',
+    FileRoutesByPath['/authed/settings/account-settings']['parentRoute'],
+    FileRoutesByPath['/authed/settings/account-settings']['id'],
+    FileRoutesByPath['/authed/settings/account-settings']['path'],
+    FileRoutesByPath['/authed/settings/account-settings']['fullPath']
+  >
+}
+
+interface AuthedRouteChildren {
+  AuthedCampaignsRoute: typeof AuthedCampaignsRoute
+  AuthedClientsRoute: typeof AuthedClientsRoute
+  AuthedCommunicationRoute: typeof AuthedCommunicationRoute
+  AuthedDashboardRoute: typeof AuthedDashboardRoute
+  AuthedLeadsRoute: typeof AuthedLeadsRoute
+  AuthedReportsRoute: typeof AuthedReportsRoute
+  AuthedTasksRoute: typeof AuthedTasksRoute
+  AuthedIndexRoute: typeof AuthedIndexRoute
+  AuthedSettingsAccountSettingsRoute: typeof AuthedSettingsAccountSettingsRoute
+}
+
+const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedCampaignsRoute: AuthedCampaignsRoute,
+  AuthedClientsRoute: AuthedClientsRoute,
+  AuthedCommunicationRoute: AuthedCommunicationRoute,
+  AuthedDashboardRoute: AuthedDashboardRoute,
+  AuthedLeadsRoute: AuthedLeadsRoute,
+  AuthedReportsRoute: AuthedReportsRoute,
+  AuthedTasksRoute: AuthedTasksRoute,
+  AuthedIndexRoute: AuthedIndexRoute,
+  AuthedSettingsAccountSettingsRoute: AuthedSettingsAccountSettingsRoute,
+}
+
+const AuthedRouteWithChildren =
+  AuthedRoute._addFileChildren(AuthedRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CampaignsRoute: CampaignsRoute,
-  ClientsRoute: ClientsRoute,
-  CommunicationRoute: CommunicationRoute,
-  DashboardRoute: DashboardRoute,
-  LeadsRoute: LeadsRoute,
-  ReportsRoute: ReportsRoute,
-  TasksRoute: TasksRoute,
+  AuthedRoute: AuthedRouteWithChildren,
+  LoginRoute: LoginRoute,
+  RegisterRoute: RegisterRoute,
   SettingsAccountSettingsRoute: SettingsAccountSettingsRoute,
 }
 export const routeTree = rootRouteImport

@@ -6,7 +6,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Avatar } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
 
 export default function AccountSettingsPage() {
   return (

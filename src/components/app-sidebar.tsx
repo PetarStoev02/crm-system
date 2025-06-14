@@ -33,60 +33,60 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "/dashboard",
+      url: "/authed/dashboard",
       icon: BarChart3,
       isActive: true,
     },
     {
       title: "Leads",
-      url: "/leads",
+      url: "/authed/leads",
       icon: Target,
     },
     {
       title: "Clients",
-      url: "/clients",
+      url: "/authed/clients",
       icon: Building2,
     },
     {
       title: "Tasks",
-      url: "/tasks",
+      url: "/authed/tasks",
       icon: Calendar,
     },
     {
       title: "Campaigns",
-      url: "/campaigns",
+      url: "/authed/campaigns",
       icon: PieChart,
     },
     {
       title: "Communication",
-      url: "/communication",
+      url: "/authed/communication",
       icon: MessageSquare,
     },
     {
       title: "Reports",
-      url: "/reports",
+      url: "/authed/reports",
       icon: BarChart3,
     },
     {
       title: "Settings",
-      url: "/settings",
+      url: "/authed/settings",
       icon: Settings2,
       items: [
         {
           title: "Account Settings",
-          url: "/settings/account-settings",
+          url: "/authed/settings/account-settings",
         },
         {
           title: "General",
-          url: "/settings/general",
+          url: "/authed/settings/general",
         },
         {
           title: "Team",
-          url: "/settings/team",
+          url: "/authed/settings/team",
         },
         {
           title: "Billing",
-          url: "/settings/billing",
+          url: "/authed/settings/billing",
         },
       ],
     },
@@ -106,17 +106,17 @@ const data = {
   projects: [
     {
       name: "Active Campaigns",
-      url: "/campaigns/active",
+      url: "/authed/campaigns/active",
       icon: Target,
     },
     {
       name: "Team Tasks",
-      url: "/tasks/team",
+      url: "/authed/tasks/team",
       icon: Users,
     },
     {
       name: "Client Reports",
-      url: "/reports/clients",
+      url: "/authed/reports/clients",
       icon: Building2,
     },
   ],

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -79,24 +79,4 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
-
-/* Remove dark theme */
-.dark { }
-
-/* Force all links to be gray */
-a, a:visited {
-  color: #4b5563 !important; /* gray-600 */
-}
-a:hover, a:focus {
-  color: #374151 !important; /* gray-700 */
 }
