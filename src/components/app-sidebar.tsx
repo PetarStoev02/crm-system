@@ -73,6 +73,10 @@ const data = {
       icon: Settings2,
       items: [
         {
+          title: "Account Settings",
+          url: "/settings/account-settings",
+        },
+        {
           title: "General",
           url: "/settings/general",
         },

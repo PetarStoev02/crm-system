@@ -19,6 +19,7 @@ import { Route as CommunicationRouteImport } from './routes/communication'
 import { Route as ClientsRouteImport } from './routes/clients'
 import { Route as CampaignsRouteImport } from './routes/campaigns'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SettingsAccountSettingsRouteImport } from './routes/settings/account-settings'
 
 const TasksRoute = TasksRouteImport.update({
   id: '/tasks',
@@ -60,6 +61,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsAccountSettingsRoute = SettingsAccountSettingsRouteImport.update({
+  id: '/settings/account-settings',
+  path: '/settings/account-settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/leads': typeof LeadsRoute
   '/reports': typeof ReportsRoute
   '/tasks': typeof TasksRoute
+  '/settings/account-settings': typeof SettingsAccountSettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/leads': typeof LeadsRoute
   '/reports': typeof ReportsRoute
   '/tasks': typeof TasksRoute
+  '/settings/account-settings': typeof SettingsAccountSettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -91,6 +99,7 @@ export interface FileRoutesById {
   '/leads': typeof LeadsRoute
   '/reports': typeof ReportsRoute
   '/tasks': typeof TasksRoute
+  '/settings/account-settings': typeof SettingsAccountSettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -103,6 +112,7 @@ export interface FileRouteTypes {
     | '/leads'
     | '/reports'
     | '/tasks'
+    | '/settings/account-settings'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -113,6 +123,7 @@ export interface FileRouteTypes {
     | '/leads'
     | '/reports'
     | '/tasks'
+    | '/settings/account-settings'
   id:
     | '__root__'
     | '/'
@@ -123,6 +134,7 @@ export interface FileRouteTypes {
     | '/leads'
     | '/reports'
     | '/tasks'
+    | '/settings/account-settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -134,6 +146,7 @@ export interface RootRouteChildren {
   LeadsRoute: typeof LeadsRoute
   ReportsRoute: typeof ReportsRoute
   TasksRoute: typeof TasksRoute
+  SettingsAccountSettingsRoute: typeof SettingsAccountSettingsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -192,6 +205,13 @@ declare module '@tanstack/react-router' {
       path: '/tasks'
       fullPath: '/tasks'
       preLoaderRoute: typeof TasksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/account-settings': {
+      id: '/settings/account-settings'
+      path: '/settings/account-settings'
+      fullPath: '/settings/account-settings'
+      preLoaderRoute: typeof SettingsAccountSettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -269,6 +289,15 @@ declare module './routes/tasks' {
     FileRoutesByPath['/tasks']['fullPath']
   >
 }
+declare module './routes/settings/account-settings' {
+  const createFileRoute: CreateFileRoute<
+    '/settings/account-settings',
+    FileRoutesByPath['/settings/account-settings']['parentRoute'],
+    FileRoutesByPath['/settings/account-settings']['id'],
+    FileRoutesByPath['/settings/account-settings']['path'],
+    FileRoutesByPath['/settings/account-settings']['fullPath']
+  >
+}
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -279,6 +308,7 @@ const rootRouteChildren: RootRouteChildren = {
   LeadsRoute: LeadsRoute,
   ReportsRoute: ReportsRoute,
   TasksRoute: TasksRoute,
+  SettingsAccountSettingsRoute: SettingsAccountSettingsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
