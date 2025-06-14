@@ -1,0 +1,118 @@
+# Feature-Sliced Design Overview
+
+**Feature-Sliced Design** (FSD) is an architectural methodology for scaffolding front-end applications. Simply put, it's a compilation of rules and conventions on organizing code. The main purpose of this methodology is to make the project more understandable and stable in the face of ever-changing business requirements.
+
+## Basic Structure
+
+Here is a simple project that implements FSD:
+
+- `📁 app`
+- `📁 pages`
+- `📁 shared`
+
+These top-level folders are called _layers_. Let's look deeper:
+
+- `📂 app`
+    - `📁 routes`
+    - `📁 analytics`
+- `📂 pages`
+    - `📁 home`
+    - `📂 article-reader`
+        - `📁 ui`
+        - `📁 api`
+    - `📁 settings`
+- `📂 shared`
+    - `📁 ui`
+    - `📁 api`
+
+Folders inside `📂 pages` are called _slices_. They divide the layer by domain (in this case, by pages).
+
+Folders inside `📂 app`, `📂 shared`, and `📂 pages/article-reader` are called _segments_, and they divide slices (or layers) by technical purpose, i.e. what the code is for.
+
+### Layers
+
+Layers are standardized across all FSD projects. You don't have to use all of the layers, but their names are important. There are currently seven of them (from top to bottom):
+
+1. **App** — everything that makes the app run — routing, entrypoints, global styles, providers.
+2. **Processes** (deprecated) — complex inter-page scenarios.
+3. **Pages** — full pages or large parts of a page in nested routing.
+4. **Widgets** — large self-contained chunks of functionality or UI, usually delivering an entire use case.
+5. **Features** — _reused_ implementations of entire product features, i.e. actions that bring business value to the user.
+6. **Entities** — business entities that the project works with, like `user` or `product`.
+7. **Shared** — reusable functionality, especially when it's detached from the specifics of the project/business, though not necessarily.
+
+_\* — these layers, **App** and **Shared**, unlike the other layers, don't have slices, and are made up of segments directly._
+
+The trick with layers is that modules on one layer can only know about and import from modules from the layers strictly below.
+
+### Slices
+
+Next up are slices, which partition the code by business domain. You're free to choose any names for them, and create as many as you wish. Slices make your codebase easier to navigate by keeping logically related modules close together.
+
+Slices cannot use other slices on the same layer, and that helps with high cohesion and low coupling.
+
+### Segments
+
+Slices, as well as layers App and Shared, consist of segments, and segments group your code by its purpose. Segment names are not constrained by the standard, but there are several conventional names for the most common purposes:
+
+- `ui` — everything related to UI display: UI components, date formatters, styles, etc.
+- `api` — backend interactions: request functions, data types, mappers, etc.
+- `model` — the data model: schemas, interfaces, stores, and business logic.
+- `lib` — library code that other modules on this slice need.
+- `config` — configuration files and feature flags.
+
+## Choosing a layer
+
+In FSD we always try to keep the logic as close to the layer as possible. Most of our logic will be tied to a specific page so this is the layer you use by default generally.
+
+If you are building a piece of functionality with multiple segments that is used on multiple pages, this is a feature. So a feature is a reusable piece of functionality that can be used in multiple pages.
+
+Small pieces of code that are specifically tied to an entity that are re-used are placed in the entities layer. For example, a GraphQL fragment or a data transformer. And generic small pieces of code that are used all across the app are placed in the shared layer.
+
+# UI
+
+We use shadcn as our guidance and documentation. This is our opinionated set of components and way of building UI in our app. We try to use shadcn as a base and convert it to our own style. It's important that you try not to change the props. Since shadcn internally uses other shadcn components, it will be difficult to include more shadcn components later on.
+
+# Forms
+
+A lot of parts come together in a form, a form handles form validation, form state, and form submission by using an API and error handling. Since a big part of our app consists of form handling, we have a form architecture that we use where all responsibilities are clearly defined.
+
+## Form Architecture
+
+### Segment Structure
+
+```
+├── ui/
+│   ├── user-info-form.tsx # Form component and UI
+├── model/
+│   ├── user-info-schema.ts # Validation schema
+├── lib/
+│   └── user-info-form-state.ts # Form state, triggers validation
+└── api/
+    └── use-register.ts # Registration mutation
+```
+
+### Implementation Details
+
+### ui/{subject}-form.tsx:
+
+#### What it does:
+
+It handles the form state, validation, submission, and error handling. It does this by binding all form-related logic together like:
+
+- {subject}-form-state
+- use-{subject}-mutation.ts
+
+#### What it does not do:
+
+- When a form is successfully submitted, it does not navigate anywhere. The form can have an onSuccess callback.
+
+### model/{subject}-schema.ts:
+
+#### What it does:
+
+It defines the form schema, which is used to validate the form state.
+
+### lib/{subject}-form-state.ts:
+
+It manages the form state and triggers validation. 
