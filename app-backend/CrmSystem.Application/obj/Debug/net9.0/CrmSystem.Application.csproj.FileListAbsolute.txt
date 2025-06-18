@@ -1,0 +1,16 @@
+/Users/petarstoev/Code/crm-system/app-backend/CrmSystem.Application/bin/Debug/net9.0/CrmSystem.Application.deps.json
+/Users/petarstoev/Code/crm-system/app-backend/CrmSystem.Application/bin/Debug/net9.0/CrmSystem.Application.dll
+/Users/petarstoev/Code/crm-system/app-backend/CrmSystem.Application/bin/Debug/net9.0/CrmSystem.Application.pdb
+/Users/petarstoev/Code/crm-system/app-backend/CrmSystem.Application/bin/Debug/net9.0/CrmSystem.Core.dll
+/Users/petarstoev/Code/crm-system/app-backend/CrmSystem.Application/bin/Debug/net9.0/CrmSystem.Core.pdb
+/Users/petarstoev/Code/crm-system/app-backend/CrmSystem.Application/obj/Debug/net9.0/CrmSystem.Application.csproj.AssemblyReference.cache
+/Users/petarstoev/Code/crm-system/app-backend/CrmSystem.Application/obj/Debug/net9.0/CrmSystem.Application.GeneratedMSBuildEditorConfig.editorconfig
+/Users/petarstoev/Code/crm-system/app-backend/CrmSystem.Application/obj/Debug/net9.0/CrmSystem.Application.AssemblyInfoInputs.cache
+/Users/petarstoev/Code/crm-system/app-backend/CrmSystem.Application/obj/Debug/net9.0/CrmSystem.Application.AssemblyInfo.cs
+/Users/petarstoev/Code/crm-system/app-backend/CrmSystem.Application/obj/Debug/net9.0/CrmSystem.Application.csproj.CoreCompileInputs.cache
+/Users/petarstoev/Code/crm-system/app-backend/CrmSystem.Application/obj/Debug/net9.0/CrmSystem.Application.sourcelink.json
+/Users/petarstoev/Code/crm-system/app-backend/CrmSystem.Application/obj/Debug/net9.0/CrmSyste.E6184C87.Up2Date
+/Users/petarstoev/Code/crm-system/app-backend/CrmSystem.Application/obj/Debug/net9.0/CrmSystem.Application.dll
+/Users/petarstoev/Code/crm-system/app-backend/CrmSystem.Application/obj/Debug/net9.0/refint/CrmSystem.Application.dll
+/Users/petarstoev/Code/crm-system/app-backend/CrmSystem.Application/obj/Debug/net9.0/CrmSystem.Application.pdb
+/Users/petarstoev/Code/crm-system/app-backend/CrmSystem.Application/obj/Debug/net9.0/ref/CrmSystem.Application.dll
