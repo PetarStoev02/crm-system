@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { authService, type User, type LoginRequest } from '@/lib/auth';
+import { authService, type User, type LoginRequest, type RegisterRequest } from '@/lib/auth';
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (credentials: LoginRequest) => Promise<void>;
+  register: (userData: RegisterRequest) => Promise<void>;
   logout: () => void;
 }
 
@@ -36,6 +37,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const register = async (userData: RegisterRequest) => {
+    setIsLoading(true);
+    try {
+      await authService.register(userData);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const logout = () => {
     authService.logout();
     setUser(null);
@@ -46,6 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isAuthenticated: authService.isAuthenticated(),
     isLoading,
     login,
+    register,
     logout,
   };
 

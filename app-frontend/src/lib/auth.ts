@@ -7,6 +7,13 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
+
 export interface LoginResponse {
   token: string;
   email: string;
@@ -68,6 +75,17 @@ class AuthService {
         throw new Error('Invalid email or password');
       }
       throw new Error('Login failed. Please try again.');
+    }
+  }
+
+  async register(userData: RegisterRequest): Promise<void> {
+    try {
+      await axios.post(`${API_BASE_URL}/auth/register`, userData);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 400) {
+        throw new Error('User with this email already exists');
+      }
+      throw new Error('Registration failed. Please try again.');
     }
   }
 

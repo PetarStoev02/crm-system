@@ -121,6 +121,17 @@ export default function LoginPage() {
               <div className="text-center text-xs text-gray-500">
                 Email: user1@test.test • Password: password
               </div>
+              <div className="text-center text-sm text-gray-600 mt-4">
+                Don't have an account?{' '}
+                <button 
+                  type="button"
+                  onClick={() => navigate({ to: '/register' })}
+                  className="font-medium text-blue-600 hover:text-blue-500 underline"
+                  disabled={isLoading}
+                >
+                  Sign up
+                </button>
+              </div>
             </div>
           </CardFooter>
         </Card>
