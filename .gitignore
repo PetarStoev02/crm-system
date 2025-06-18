@@ -1,0 +1,215 @@
+# ===========================
+# CRM System - Root .gitignore
+# ===========================
+
+# OS Generated Files
+# ==================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# IDE & Editor Files
+# ==================
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+.idea/
+*.swp
+*.swo
+*~
+.project
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.buildpath
+
+# Frontend (Node.js/React/Vite)
+# ==============================
+app-frontend/node_modules/
+app-frontend/dist/
+app-frontend/dist-ssr/
+app-frontend/build/
+app-frontend/.env
+app-frontend/.env.local
+app-frontend/.env.development.local
+app-frontend/.env.test.local
+app-frontend/.env.production.local
+app-frontend/.vite/
+app-frontend/.tanstack/
+app-frontend/coverage/
+app-frontend/.nyc_output/
+
+# Frontend Logs
+app-frontend/logs/
+app-frontend/*.log
+app-frontend/npm-debug.log*
+app-frontend/yarn-debug.log*
+app-frontend/yarn-error.log*
+app-frontend/pnpm-debug.log*
+app-frontend/lerna-debug.log*
+
+# Backend (.NET)
+# ==============
+app-backend/**/bin/
+app-backend/**/obj/
+app-backend/**/*.user
+app-backend/**/*.suo
+app-backend/**/*.userprefs
+app-backend/**/*.pidb
+app-backend/**/*.userprefs
+app-backend/**/*.DS_Store
+app-backend/**/*.ncrunchsolution
+app-backend/**/*.ncrunchproject
+app-backend/**/.sonarqube
+
+# .NET Build Results
+app-backend/**/[Bb]in/
+app-backend/**/[Oo]bj/
+app-backend/**/[Ll]og/
+app-backend/**/[Ll]ogs/
+
+# Visual Studio
+app-backend/**/.vs/
+app-backend/**/launchSettings.json
+app-backend/**/Properties/launchSettings.json
+
+# Database Files
+# ==============
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.mdf
+*.ldf
+
+# Environment Files
+# =================
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+appsettings.Development.json
+appsettings.Production.json
+appsettings.*.json
+!appsettings.json
+
+# Secrets
+# =======
+secrets.json
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Package Manager Files
+# =====================
+node_modules/
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+.pnpm-debug.log*
+
+# NuGet Packages
+app-backend/packages/
+app-backend/*.nupkg
+app-backend/*.snupkg
+app-backend/.nuget/
+
+# Test Results
+# ============
+TestResults/
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+*.coveragexml
+coverage/
+.nyc_output/
+
+# Runtime Files
+# =============
+*.pid
+*.seed
+*.pid.lock
+
+# Temporary Files
+# ===============
+*.tmp
+*.temp
+*~
+.#*
+
+# JetBrains IDEs
+# ==============
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Documentation
+# =============
+docs/_build/
+.vuepress/dist
+
+# Docker
+# ======
+.docker/
+docker-compose.override.yml
+
+# Cache directories
+# =================
+.cache/
+.parcel-cache/
+
+# Runtime data
+# ============
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Compiled binary addons
+build/Release
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity 
