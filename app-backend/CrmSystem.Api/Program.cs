@@ -1,6 +1,7 @@
 using CrmSystem.Application.Services;
 using CrmSystem.Core.Entities;
 using CrmSystem.Infrastructure.Data;
+using Task = System.Threading.Tasks.Task;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -67,6 +68,7 @@ builder.Services.AddControllers();
 
 // Add application services
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IDashboardService, CrmSystem.Infrastructure.Services.ConcreteDashboardService>();
 
 // Add Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -136,8 +138,8 @@ static async Task SeedDatabase(IServiceProvider services)
     var context = services.GetRequiredService<AppDbContext>();
     var userManager = services.GetRequiredService<UserManager<User>>();
 
-    // Ensure database is created
-    await context.Database.EnsureCreatedAsync();
+    // Run pending migrations
+    await context.Database.MigrateAsync();
 
     // Check if default user exists
     var defaultUser = await userManager.FindByEmailAsync("user1@test.test");
@@ -167,4 +169,6 @@ static async Task SeedDatabase(IServiceProvider services)
             }
         }
     }
+
+    return;
 }

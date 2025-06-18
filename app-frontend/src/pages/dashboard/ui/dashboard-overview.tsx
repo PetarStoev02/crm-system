@@ -1,50 +1,158 @@
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Users, Megaphone, Percent, DollarSign } from "lucide-react";
+import { Users, Megaphone, Percent, DollarSign, Clock, AlertCircle } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { dashboardAPI, type DashboardOverview as DashboardData } from "@/lib/dashboard-api";
+import { DashboardStatSkeleton, DashboardListSkeleton } from "@/components/ui/skeleton";
+import { EmptyTasks, EmptyActivity, EmptyCampaigns, EmptyLeads } from "@/components/ui/empty-state";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export const DashboardOverview = () => {
+  const { user } = useAuth();
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await dashboardAPI.getDashboardOverview();
+        setDashboardData(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load dashboard data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const getTimeLeft = (daysLeft: number) => {
+    if (daysLeft < 0) return 'Overdue';
+    if (daysLeft === 0) return 'Due today';
+    if (daysLeft === 1) return '1 day left';
+    return `${daysLeft} days left`;
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority.toLowerCase()) {
+      case 'high': return 'text-red-600';
+      case 'medium': return 'text-yellow-600';
+      case 'low': return 'text-green-600';
+      default: return 'text-gray-600';
+    }
+  };
+
+  if (error) {
+    return (
+      <div className="p-8 bg-gray-50 min-h-screen">
+        <h1 className="text-3xl font-bold text-gray-900 mb-1">Dashboard</h1>
+        <p className="text-gray-500 mb-8">Welcome back, {user?.firstName}!</p>
+        
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {error}. Please try refreshing the page.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
       <h1 className="text-3xl font-bold text-gray-900 mb-1">Dashboard</h1>
-      <p className="text-gray-500 mb-8">Overview of your marketing operations</p>
+      <p className="text-gray-500 mb-8">Welcome back, {user?.firstName}! Here's your overview.</p>
+      
       {/* Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <Card>
           <CardContent className="flex flex-col gap-2 py-4">
             <span className="text-gray-500 text-sm">Active Campaigns</span>
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-gray-900">12</span>
-              <Megaphone className="w-5 h-5 text-gray-400" />
+              {loading ? (
+                <DashboardStatSkeleton />
+              ) : (
+                <>
+                  <span className="text-2xl font-bold text-gray-900">
+                    {dashboardData?.stats.activeCampaigns ?? 0}
+                  </span>
+                  <Megaphone className="w-5 h-5 text-gray-400" />
+                </>
+              )}
             </div>
           </CardContent>
         </Card>
+        
         <Card>
           <CardContent className="flex flex-col gap-2 py-4">
             <span className="text-gray-500 text-sm">Total Leads</span>
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-gray-900">348</span>
-              <Users className="w-5 h-5 text-gray-400" />
+              {loading ? (
+                <DashboardStatSkeleton />
+              ) : (
+                <>
+                  <span className="text-2xl font-bold text-gray-900">
+                    {dashboardData?.stats.totalLeads ?? 0}
+                  </span>
+                  <Users className="w-5 h-5 text-gray-400" />
+                </>
+              )}
             </div>
           </CardContent>
         </Card>
+        
         <Card>
           <CardContent className="flex flex-col gap-2 py-4">
             <span className="text-gray-500 text-sm">Conversion Rate</span>
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-gray-900">24.5%</span>
-              <Percent className="w-5 h-5 text-gray-400" />
+              {loading ? (
+                <DashboardStatSkeleton />
+              ) : (
+                <>
+                  <span className="text-2xl font-bold text-gray-900">
+                    {dashboardData?.stats.conversionRate ?? 0}%
+                  </span>
+                  <Percent className="w-5 h-5 text-gray-400" />
+                </>
+              )}
             </div>
           </CardContent>
         </Card>
+        
         <Card>
           <CardContent className="flex flex-col gap-2 py-4">
             <span className="text-gray-500 text-sm">Monthly ROI</span>
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-gray-900">185%</span>
-              <DollarSign className="w-5 h-5 text-gray-400" />
+              {loading ? (
+                <DashboardStatSkeleton />
+              ) : (
+                <>
+                  <span className="text-2xl font-bold text-gray-900">
+                    {dashboardData?.stats.monthlyROI ?? 0}%
+                  </span>
+                  <DollarSign className="w-5 h-5 text-gray-400" />
+                </>
+              )}
             </div>
           </CardContent>
         </Card>
       </div>
+
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Column */}
@@ -56,31 +164,35 @@ export const DashboardOverview = () => {
                 <span className="font-semibold text-gray-900">Recent Campaigns</span>
                 <a href="#" className="text-sm font-medium text-gray-500 hover:text-gray-700">View All</a>
               </div>
-              <div className="flex flex-col gap-2">
-                <div className="flex justify-between items-center bg-gray-50 rounded px-3 py-2">
-                  <div>
-                    <div className="font-medium text-gray-900">Summer Sale Campaign</div>
-                    <div className="text-xs text-gray-500">Social Media • 15 days left</div>
-                  </div>
-                  <span className="text-xs text-gray-500">Active</span>
+              
+              {loading ? (
+                <DashboardListSkeleton />
+              ) : dashboardData?.recentCampaigns.length === 0 ? (
+                <EmptyCampaigns />
+              ) : (
+                <div className="flex flex-col gap-2">
+                  {dashboardData?.recentCampaigns.map((campaign) => (
+                    <div key={campaign.id} className="flex justify-between items-center bg-gray-50 rounded px-3 py-2">
+                      <div>
+                        <div className="font-medium text-gray-900">{campaign.name}</div>
+                        <div className="text-xs text-gray-500">
+                          {campaign.type} • {getTimeLeft(campaign.daysLeft)}
+                        </div>
+                      </div>
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        campaign.status === 'Active' ? 'bg-green-100 text-green-800' :
+                        campaign.status === 'Completed' ? 'bg-gray-100 text-gray-600' :
+                        'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {campaign.status}
+                      </span>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex justify-between items-center bg-gray-50 rounded px-3 py-2">
-                  <div>
-                    <div className="font-medium text-gray-900">Product Launch Email</div>
-                    <div className="text-xs text-gray-500">Email Marketing • 3 days left</div>
-                  </div>
-                  <span className="text-xs text-gray-500">Active</span>
-                </div>
-                <div className="flex justify-between items-center bg-gray-50 rounded px-3 py-2">
-                  <div>
-                    <div className="font-medium text-gray-900">Q4 Brand Awareness</div>
-                    <div className="text-xs text-gray-500">Display Ads • Completed</div>
-                  </div>
-                  <span className="text-xs text-gray-400">Completed</span>
-                </div>
-              </div>
+              )}
             </CardContent>
           </Card>
+
           {/* Upcoming Tasks */}
           <Card>
             <CardContent className="p-6">
@@ -88,32 +200,48 @@ export const DashboardOverview = () => {
                 <span className="font-semibold text-gray-900">Upcoming Tasks</span>
                 <a href="#" className="text-sm font-medium text-gray-500 hover:text-gray-700">View All</a>
               </div>
-              <div className="flex flex-col gap-2">
-                <div className="flex items-start gap-2">
-                  <input type="checkbox" className="mt-1 accent-gray-400" />
-                  <div>
-                    <div className="text-gray-900">Review campaign performance</div>
-                    <div className="text-xs text-gray-500">Due today at 3:00 PM</div>
-                  </div>
+              
+              {loading ? (
+                <DashboardListSkeleton />
+              ) : dashboardData?.upcomingTasks.length === 0 ? (
+                <EmptyTasks />
+              ) : (
+                <div className="flex flex-col gap-2">
+                  {dashboardData?.upcomingTasks.map((task) => (
+                    <div key={task.id} className="flex items-start gap-2">
+                      <input 
+                        type="checkbox" 
+                        checked={task.isCompleted}
+                        readOnly
+                        className="mt-1 accent-gray-400" 
+                      />
+                      <div className="flex-1">
+                        <div className={`text-gray-900 ${task.isCompleted ? 'line-through text-gray-500' : ''}`}>
+                          {task.title}
+                        </div>
+                        <div className="text-xs text-gray-500 flex items-center gap-2">
+                          {task.dueDate && (
+                            <span className="flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              {formatDate(task.dueDate)}
+                            </span>
+                          )}
+                          {task.relatedEntityName && (
+                            <span>• {task.relatedEntityName}</span>
+                          )}
+                          <span className={`${getPriorityColor(task.priority)}`}>
+                            {task.priority}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex items-start gap-2">
-                  <input type="checkbox" className="mt-1 accent-gray-400" />
-                  <div>
-                    <div className="text-gray-900">Client presentation prep</div>
-                    <div className="text-xs text-gray-500">Due tomorrow at 10:00 AM</div>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <input type="checkbox" checked readOnly className="mt-1 accent-gray-400" />
-                  <div>
-                    <div className="text-gray-500 line-through">Send weekly report</div>
-                    <div className="text-xs text-gray-400">Completed yesterday</div>
-                  </div>
-                </div>
-              </div>
+              )}
             </CardContent>
           </Card>
         </div>
+
         {/* Right Column */}
         <div className="flex flex-col gap-6">
           {/* High Priority Leads */}
@@ -123,31 +251,41 @@ export const DashboardOverview = () => {
                 <span className="font-semibold text-gray-900">High Priority Leads</span>
                 <a href="#" className="text-sm font-medium text-gray-500 hover:text-gray-700">View All</a>
               </div>
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between bg-gray-50 rounded px-3 py-2">
-                  <div>
-                    <div className="font-medium text-gray-900">Sarah Johnson</div>
-                    <div className="text-xs text-gray-500">TechCorp Inc. • Follow up due</div>
-                  </div>
-                  <span className="text-xs text-gray-500">High</span>
+              
+              {loading ? (
+                <DashboardListSkeleton />
+              ) : dashboardData?.highPriorityLeads.length === 0 ? (
+                <EmptyLeads />
+              ) : (
+                <div className="flex flex-col gap-2">
+                  {dashboardData?.highPriorityLeads.map((lead) => (
+                    <div key={lead.id} className="flex items-center justify-between bg-gray-50 rounded px-3 py-2">
+                      <div>
+                        <div className="font-medium text-gray-900">
+                          {lead.firstName} {lead.lastName}
+                        </div>
+                        <div className="text-xs text-gray-500 flex items-center gap-2">
+                          <span>{lead.company}</span>
+                          <span>•</span>
+                          <span>{lead.status}</span>
+                          {lead.lastContactedAt && (
+                            <>
+                              <span>•</span>
+                              <span>Last contact: {formatDate(lead.lastContactedAt)}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <span className={`text-xs font-medium ${getPriorityColor(lead.priority)}`}>
+                        {lead.priority}
+                      </span>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex items-center justify-between bg-gray-50 rounded px-3 py-2">
-                  <div>
-                    <div className="font-medium text-gray-900">Michael Chen</div>
-                    <div className="text-xs text-gray-500">StartupXYZ • Proposal sent</div>
-                  </div>
-                  <span className="text-xs text-gray-400">Medium</span>
-                </div>
-                <div className="flex items-center justify-between bg-gray-50 rounded px-3 py-2">
-                  <div>
-                    <div className="font-medium text-gray-900">Emma Davis</div>
-                    <div className="text-xs text-gray-500">Growth Co. • Initial contact</div>
-                  </div>
-                  <span className="text-xs text-gray-500">High</span>
-                </div>
-              </div>
+              )}
             </CardContent>
           </Card>
+
           {/* Team Activity */}
           <Card>
             <CardContent className="p-6">
@@ -155,35 +293,32 @@ export const DashboardOverview = () => {
                 <span className="font-semibold text-gray-900">Team Activity</span>
                 <a href="#" className="text-sm font-medium text-gray-500 hover:text-gray-700">View All</a>
               </div>
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <div className="rounded-full bg-gray-200 w-8 h-8 flex items-center justify-center">
-                    <span className="text-gray-500 font-bold">👤</span>
-                  </div>
-                  <div>
-                    <div className="text-gray-900">Alex Smith updated lead status</div>
-                    <div className="text-xs text-gray-500">2 hours ago</div>
-                  </div>
+              
+              {loading ? (
+                <DashboardListSkeleton />
+              ) : dashboardData?.teamActivity.length === 0 ? (
+                <EmptyActivity />
+              ) : (
+                <div className="flex flex-col gap-2">
+                  {dashboardData?.teamActivity.map((activity, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <div className="rounded-full bg-gray-200 w-8 h-8 flex items-center justify-center">
+                        <span className="text-gray-500 font-bold text-sm">
+                          {activity.userName.split(' ').map(n => n[0]).join('')}
+                        </span>
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-gray-900 text-sm">
+                          <span className="font-medium">{activity.userName}</span> {activity.activity}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {formatDate(activity.timestamp)}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="rounded-full bg-gray-200 w-8 h-8 flex items-center justify-center">
-                    <span className="text-gray-500 font-bold">👤</span>
-                  </div>
-                  <div>
-                    <div className="text-gray-900">Lisa Wong created new campaign</div>
-                    <div className="text-xs text-gray-500">4 hours ago</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="rounded-full bg-gray-200 w-8 h-8 flex items-center justify-center">
-                    <span className="text-gray-500 font-bold">👤</span>
-                  </div>
-                  <div>
-                    <div className="text-gray-900">John Doe completed task</div>
-                    <div className="text-xs text-gray-500">1 day ago</div>
-                  </div>
-                </div>
-              </div>
+              )}
             </CardContent>
           </Card>
         </div>
