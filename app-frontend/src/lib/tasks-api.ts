@@ -168,12 +168,48 @@ export const tasksAPI = {
         `${API_BASE_URL}/api/campaigns?limit=100`,
         getConfig()
       );
-      return response.data.campaigns?.map((campaign: any) => ({
+      return response.data.campaigns?.map((campaign: { id: number; name: string }) => ({
         id: campaign.id,
         name: campaign.name
       })) || [];
     } catch (error) {
       console.error('Error fetching campaigns:', error);
+      return [];
+    }
+  },
+
+  // Helper method to get tasks for calendar view
+  async getTasksForCalendar(): Promise<Array<{
+    id: number;
+    title: string;
+    dueDate: string;
+    priority: string;
+    status: string;
+    relatedLead?: { id: number; firstName: string; lastName: string };
+    relatedCampaign?: { id: number; name: string };
+  }>> {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/api/tasks?limit=1000&status=Pending,In Progress`,
+        getConfig()
+      );
+      return response.data.tasks
+        .filter((task: Task) => task.dueDate) // Only include tasks with due dates
+        .map((task: Task) => ({
+          id: task.id,
+          title: task.title,
+          dueDate: task.dueDate!,
+          priority: task.priority,
+          status: task.status,
+          relatedLead: task.relatedLead ? {
+            id: task.relatedLead.id,
+            firstName: task.relatedLead.name.split(' ')[0] || '',
+            lastName: task.relatedLead.name.split(' ')[1] || ''
+          } : undefined,
+          relatedCampaign: task.relatedCampaign
+        }));
+    } catch (error) {
+      console.error('Error fetching tasks for calendar:', error);
       return [];
     }
   }

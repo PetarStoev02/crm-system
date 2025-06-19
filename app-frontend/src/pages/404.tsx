@@ -28,7 +28,7 @@ export default function NotFoundPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="absolute top-0 left-0 min-h-screen bg-gray-50 flex items-center justify-center p-4 min-w-screen z-99 ">
       <Card className="w-full max-w-md">
         <CardContent className="p-8 text-center">
           <div className="flex justify-center mb-6">

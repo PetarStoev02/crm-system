@@ -1,12 +1,13 @@
-import { Outlet, redirect } from '@tanstack/react-router';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { AppSidebar } from '@/components/app-sidebar';
-import { authService } from '@/lib/auth';
+import { Outlet, redirect } from "@tanstack/react-router";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
+import { authService } from "@/lib/auth";
+import NotFoundPage from "@/pages/404";
 
 export const Route = createFileRoute({
   beforeLoad: () => {
     if (!authService.isAuthenticated()) {
-      throw redirect({ to: '/login' });
+      throw redirect({ to: "/login" });
     }
   },
   component: function AuthedLayout() {
@@ -21,4 +22,5 @@ export const Route = createFileRoute({
       </SidebarProvider>
     );
   },
-}); 
+  notFoundComponent: NotFoundPage,
+});
