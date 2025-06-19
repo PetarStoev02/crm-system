@@ -1,6 +1,17 @@
 import axios from 'axios';
+import { authService } from '@/lib/auth';
 
 const API_BASE_URL = 'http://localhost:5001/api';
+
+// Fallback function to ensure auth headers are included
+const getConfig = () => {
+  const token = authService.getToken();
+  return token ? {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  } : {};
+};
 
 export interface DashboardStats {
   activeCampaigns: number;
@@ -55,10 +66,13 @@ export interface DashboardOverview {
 class DashboardAPIService {
   async getDashboardOverview(): Promise<DashboardOverview> {
     try {
-      const response = await axios.get<DashboardOverview>(`${API_BASE_URL}/dashboard/overview`);
+      const response = await axios.get<DashboardOverview>(`${API_BASE_URL}/dashboard/overview`, getConfig());
       return response.data;
     } catch (error) {
       console.error('Failed to fetch dashboard overview:', error);
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        throw new Error('Authentication required. Please log in again.');
+      }
       throw new Error('Failed to fetch dashboard data');
     }
   }
