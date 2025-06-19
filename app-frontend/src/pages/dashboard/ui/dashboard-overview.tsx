@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Users, DollarSign, Clock, AlertCircle, TrendingUp, Users2, FileText, BarChart3 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -6,6 +6,8 @@ import { dashboardAPI, type DashboardOverview as DashboardData } from "@/lib/das
 import { DashboardListSkeleton } from "@/components/ui/skeleton";
 import { EmptyTasks, EmptyActivity, EmptyCampaigns, EmptyLeads } from "@/components/ui/empty-state";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Link } from "@tanstack/react-router";
+import { TaskCalendar } from "@/components/task-calendar";
 
 export function DashboardOverview() {
   const { user } = useAuth();
@@ -214,7 +216,7 @@ export function DashboardOverview() {
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column */}
         <div className="flex flex-col gap-6">
           {/* Recent Campaigns */}
@@ -222,7 +224,7 @@ export function DashboardOverview() {
             <CardContent className="p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">Recent Campaigns</h3>
-                <a href="#" className="text-sm font-medium text-gray-500 hover:text-gray-700">View All</a>
+                <Link to="/authed/campaigns" className="text-sm font-medium text-gray-500 hover:text-gray-700">View All</Link>
               </div>
               
               {loading ? (
@@ -258,7 +260,7 @@ export function DashboardOverview() {
             <CardContent className="p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">Upcoming Tasks</h3>
-                <a href="#" className="text-sm font-medium text-gray-500 hover:text-gray-700">View All</a>
+                <Link to="/authed/tasks" className="text-sm font-medium text-gray-500 hover:text-gray-700">View All</Link>
               </div>
               
               {loading ? (
@@ -302,14 +304,14 @@ export function DashboardOverview() {
           </Card>
         </div>
 
-        {/* Right Column */}
+        {/* Middle Column */}
         <div className="flex flex-col gap-6">
           {/* High Priority Leads */}
           <Card>
             <CardContent className="p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">High Priority Leads</h3>
-                <a href="#" className="text-sm font-medium text-gray-500 hover:text-gray-700">View All</a>
+                <Link to="/authed/leads" className="text-sm font-medium text-gray-500 hover:text-gray-700">View All</Link>
               </div>
               
               {loading ? (
@@ -351,7 +353,7 @@ export function DashboardOverview() {
             <CardContent className="p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">Team Activity</h3>
-                <a href="#" className="text-sm font-medium text-gray-500 hover:text-gray-700">View All</a>
+                <Link to="/authed/communication" className="text-sm font-medium text-gray-500 hover:text-gray-700">View All</Link>
               </div>
               
               {loading ? (
@@ -381,6 +383,11 @@ export function DashboardOverview() {
               )}
             </CardContent>
           </Card>
+        </div>
+
+        {/* Right Column - Calendar */}
+        <div className="flex flex-col gap-6">
+          <TaskCalendar compact={true} />
         </div>
       </div>
     </div>

@@ -1,56 +1,247 @@
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Users, ListChecks, CheckCircle2, AlertCircle, Plus } from "lucide-react";
+import { Users, ListChecks, CheckCircle2, AlertCircle, Plus, Clock, Edit, Trash2 } from "lucide-react";
+import { tasksAPI, type Task, type TaskFilters } from "@/lib/tasks-api";
+import { TaskForm } from "./task-form";
+import { TaskCalendar } from "@/components/task-calendar";
+
+type ViewMode = 'list' | 'create' | 'edit';
 
 export function TasksOverview() {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  
+  // Filters
+  const [filters, setFilters] = useState<TaskFilters>({
+    search: '',
+    status: '',
+    priority: '',
+    page: 1,
+    limit: 10
+  });
+  
+  // Pagination
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+
+  // Stats
+  const [stats, setStats] = useState({
+    total: 0,
+    inProgress: 0,
+    completedToday: 0,
+    overdue: 0
+  });
+
+  useEffect(() => {
+    fetchTasks();
+  }, [filters]);
+
+  const fetchTasks = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await tasksAPI.getTasks(filters);
+      setTasks(response.tasks);
+      setTotalPages(response.totalPages);
+      setTotalCount(response.totalCount);
+      
+      // Calculate stats
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      
+      setStats({
+        total: response.totalTasks,
+        inProgress: response.tasks.filter(t => t.status === 'In Progress' || t.status === 'Pending').length,
+        completedToday: response.tasks.filter(t => {
+          if (!t.completedAt) return false;
+          const completed = new Date(t.completedAt);
+          return completed >= today;
+        }).length,
+        overdue: response.tasks.filter(t => {
+          if (!t.dueDate || t.status === 'Completed') return false;
+          return new Date(t.dueDate) < now;
+        }).length
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load tasks');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFilterChange = (key: keyof TaskFilters, value: string | number) => {
+    setFilters(prev => ({
+      ...prev,
+      [key]: value,
+      page: key !== 'page' ? 1 : Number(value) // Reset to page 1 when changing other filters, ensure number type
+    }));
+  };
+
+  const handleCreateTask = () => {
+    setEditingTask(null);
+    setViewMode('create');
+  };
+
+  const handleEditTask = (task: Task) => {
+    setEditingTask(task);
+    setViewMode('edit');
+  };
+
+  const handleDeleteTask = async (taskId: number) => {
+    if (!confirm('Are you sure you want to delete this task?')) return;
+    
+    try {
+      await tasksAPI.deleteTask(taskId);
+      await fetchTasks();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete task');
+    }
+  };
+
+  const handleTaskStatusToggle = async (task: Task) => {
+    try {
+      const newStatus = task.status === 'Completed' ? 'Pending' : 'Completed';
+      await tasksAPI.updateTaskStatus(task.id, { status: newStatus });
+      await fetchTasks();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update task status');
+    }
+  };
+
+  const handleFormSubmit = async () => {
+    await fetchTasks();
+    setViewMode('list');
+    setEditingTask(null);
+  };
+
+  const handleFormCancel = () => {
+    setViewMode('list');
+    setEditingTask(null);
+  };
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority.toLowerCase()) {
+      case 'high': return 'text-red-600 bg-red-50';
+      case 'medium': return 'text-yellow-600 bg-yellow-50';
+      case 'low': return 'text-green-600 bg-green-50';
+      default: return 'text-gray-600 bg-gray-50';
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'completed': return 'text-green-600 bg-green-50';
+      case 'in progress': return 'text-blue-600 bg-blue-50';
+      case 'pending': return 'text-yellow-600 bg-yellow-50';
+      default: return 'text-gray-600 bg-gray-50';
+    }
+  };
+
+  const isOverdue = (task: Task) => {
+    if (!task.dueDate || task.status === 'Completed') return false;
+    return new Date(task.dueDate) < new Date();
+  };
+
+  if (viewMode === 'create') {
+    return (
+      <TaskForm
+        task={null}
+        onSubmit={handleFormSubmit}
+        onCancel={handleFormCancel}
+      />
+    );
+  }
+
+  if (viewMode === 'edit' && editingTask) {
+    return (
+      <TaskForm
+        task={editingTask}
+        onSubmit={handleFormSubmit}
+        onCancel={handleFormCancel}
+      />
+    );
+  }
+
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Tasks & Calendar</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-1">Tasks & Calendar</h1>
           <p className="text-gray-500">Manage your tasks and schedule</p>
         </div>
-        <Button className="bg-gray-900 text-white hover:bg-gray-800 flex items-center gap-2">
+        <Button 
+          onClick={handleCreateTask}
+          className="bg-gray-900 text-white hover:bg-gray-800 flex items-center gap-2"
+        >
           <Plus className="w-4 h-4" />
           Add Task
         </Button>
       </div>
+
+      {/* Error Alert */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+          {error}
+        </div>
+      )}
+
       {/* Filters */}
       <Card className="mb-6">
         <CardContent className="py-4 px-6">
           <div className="flex flex-col md:flex-row gap-4">
-            <Input placeholder="Search tasks..." className="w-full md:w-1/4" />
-            <select className="w-full md:w-1/4 border rounded px-3 py-2 text-gray-600 bg-white">
-              <option>All Statuses</option>
-              <option>In Progress</option>
-              <option>Completed</option>
-              <option>Overdue</option>
+            <Input 
+              placeholder="Search tasks..." 
+              className="w-full md:w-1/4"
+              value={filters.search || ''}
+              onChange={(e) => handleFilterChange('search', e.target.value)}
+            />
+            <select 
+              className="w-full md:w-1/4 border rounded px-3 py-2 text-gray-600 bg-white"
+              value={filters.status || ''}
+              onChange={(e) => handleFilterChange('status', e.target.value)}
+            >
+              <option value="">All Statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
             </select>
-            <select className="w-full md:w-1/4 border rounded px-3 py-2 text-gray-600 bg-white">
-              <option>All Priorities</option>
-              <option>High</option>
-              <option>Medium</option>
-              <option>Low</option>
-            </select>
-            <select className="w-full md:w-1/4 border rounded px-3 py-2 text-gray-600 bg-white">
-              <option>All Team Members</option>
-              <option>Sarah Johnson</option>
-              <option>Michael Chen</option>
-              <option>Emma Davis</option>
-              <option>Alex Smith</option>
+            <select 
+              className="w-full md:w-1/4 border rounded px-3 py-2 text-gray-600 bg-white"
+              value={filters.priority || ''}
+              onChange={(e) => handleFilterChange('priority', e.target.value)}
+            >
+              <option value="">All Priorities</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
             </select>
           </div>
         </CardContent>
       </Card>
+
       {/* Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <Card>
           <CardContent className="flex flex-col gap-2 py-4">
             <span className="text-gray-500 text-sm">Total Tasks</span>
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-gray-900">28</span>
+              <span className="text-2xl font-bold text-gray-900">{stats.total}</span>
               <ListChecks className="w-5 h-5 text-gray-400" />
             </div>
           </CardContent>
@@ -59,7 +250,7 @@ export function TasksOverview() {
           <CardContent className="flex flex-col gap-2 py-4">
             <span className="text-gray-500 text-sm">In Progress</span>
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-gray-900">12</span>
+              <span className="text-2xl font-bold text-gray-900">{stats.inProgress}</span>
               <Users className="w-5 h-5 text-gray-400" />
             </div>
           </CardContent>
@@ -68,7 +259,7 @@ export function TasksOverview() {
           <CardContent className="flex flex-col gap-2 py-4">
             <span className="text-gray-500 text-sm">Completed Today</span>
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-gray-900">5</span>
+              <span className="text-2xl font-bold text-gray-900">{stats.completedToday}</span>
               <CheckCircle2 className="w-5 h-5 text-gray-400" />
             </div>
           </CardContent>
@@ -77,12 +268,13 @@ export function TasksOverview() {
           <CardContent className="flex flex-col gap-2 py-4">
             <span className="text-gray-500 text-sm">Overdue</span>
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-gray-900">3</span>
+              <span className="text-2xl font-bold text-gray-900">{stats.overdue}</span>
               <AlertCircle className="w-5 h-5 text-gray-400" />
             </div>
           </CardContent>
         </Card>
       </div>
+
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Task List (2/3 width) */}
@@ -90,118 +282,127 @@ export function TasksOverview() {
           <Card>
             <CardContent className="p-0">
               <div className="flex justify-between items-center px-6 py-4 border-b">
-                <span className="font-semibold text-gray-900">Task List</span>
-                <div className="flex gap-2">
-                  <Button variant="outline" className="border-gray-200 text-gray-600">Filter</Button>
-                  <Button variant="outline" className="border-gray-200 text-gray-600">Export</Button>
+                <h3 className="text-lg font-semibold text-gray-900">Task List</h3>
+                <div className="text-sm text-gray-500">
+                  Showing {tasks.length} of {totalCount} tasks
                 </div>
               </div>
-              <div className="flex flex-col gap-3 px-6 py-4">
-                {/* Task Card 1 */}
-                <div className="flex items-start gap-3 bg-gray-50 rounded p-4">
-                  <input type="checkbox" className="mt-1 accent-gray-400" />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-gray-900">Review Q2 campaign performance</span>
-                      <span className="text-xs text-gray-500 bg-gray-100 rounded px-2 py-1 ml-2">High</span>
+              
+              {loading ? (
+                <div className="p-6 text-center text-gray-500">Loading tasks...</div>
+              ) : tasks.length === 0 ? (
+                <div className="p-6 text-center text-gray-500">
+                  {filters.search || filters.status || filters.priority ? 
+                    'No tasks found matching your filters.' : 
+                    'No tasks yet. Create your first task to get started.'
+                  }
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3 px-6 py-4">
+                  {tasks.map((task) => (
+                    <div key={task.id} className={`flex items-start gap-3 bg-gray-50 rounded-lg p-4 ${isOverdue(task) ? 'border-l-4 border-red-500' : ''}`}>
+                      <input 
+                        type="checkbox" 
+                        checked={task.status === 'Completed'}
+                        onChange={() => handleTaskStatusToggle(task)}
+                        className="mt-1 accent-gray-400" 
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className={`font-medium text-gray-900 ${task.status === 'Completed' ? 'line-through text-gray-500' : ''}`}>
+                            {task.title}
+                          </span>
+                          <span className={`text-xs px-2 py-1 rounded-full font-medium ${getPriorityColor(task.priority)}`}>
+                            {task.priority}
+                          </span>
+                          <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(task.status)}`}>
+                            {task.status}
+                          </span>
+                          {isOverdue(task) && (
+                            <span className="text-xs px-2 py-1 rounded-full font-medium text-red-600 bg-red-50">
+                              Overdue
+                            </span>
+                          )}
+                        </div>
+                        {task.description && (
+                          <div className={`text-sm text-gray-500 mb-2 ${task.status === 'Completed' ? 'line-through' : ''}`}>
+                            {task.description}
+                          </div>
+                        )}
+                        <div className="flex items-center gap-4 text-xs text-gray-500">
+                          {task.dueDate && (
+                            <span className="flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              Due: {formatDate(task.dueDate)}
+                            </span>
+                          )}
+                          {task.relatedLead && (
+                            <span>Related to: {task.relatedLead.name}</span>
+                          )}
+                          {task.relatedCampaign && (
+                            <span>Campaign: {task.relatedCampaign.name}</span>
+                          )}
+                          {task.assignedToUser && (
+                            <span>Assigned: {task.assignedToUser.firstName} {task.assignedToUser.lastName}</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleEditTask(task)}
+                          className="text-gray-400 hover:text-gray-600"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDeleteTask(task.id)}
+                          className="text-gray-400 hover:text-red-600"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">Analyze metrics and prepare summary report for stakeholders</div>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="rounded-full bg-gray-200 w-6 h-6 flex items-center justify-center">👤</span>
-                      <span className="text-xs text-gray-500">Sarah Johnson</span>
-                      <span className="text-xs text-gray-400 ml-auto">Due: Jun 15, 2025</span>
-                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex justify-between items-center px-6 py-4 border-t">
+                  <div className="text-sm text-gray-500">
+                    Page {filters.page} of {totalPages}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={filters.page === 1}
+                      onClick={() => handleFilterChange('page', (filters.page || 1) - 1)}
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={filters.page === totalPages}
+                      onClick={() => handleFilterChange('page', (filters.page || 1) + 1)}
+                    >
+                      Next
+                    </Button>
                   </div>
                 </div>
-                {/* Task Card 2 */}
-                <div className="flex items-start gap-3 bg-gray-50 rounded p-4">
-                  <input type="checkbox" className="mt-1 accent-gray-400" />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-gray-900">Client presentation prep</span>
-                      <span className="text-xs text-gray-500 bg-gray-100 rounded px-2 py-1 ml-2">Medium</span>
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">Prepare slides for TechCorp quarterly review meeting</div>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="rounded-full bg-gray-200 w-6 h-6 flex items-center justify-center">👤</span>
-                      <span className="text-xs text-gray-500">Michael Chen</span>
-                      <span className="text-xs text-gray-400 ml-auto">Due: Jun 12, 2025</span>
-                    </div>
-                  </div>
-                </div>
-                {/* Task Card 3 */}
-                <div className="flex items-start gap-3 bg-gray-50 rounded p-4">
-                  <input type="checkbox" checked readOnly className="mt-1 accent-gray-400" />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-gray-500 line-through">Send weekly performance report</span>
-                      <span className="text-xs text-gray-400 bg-gray-100 rounded px-2 py-1 ml-2">Completed</span>
-                    </div>
-                    <div className="text-xs text-gray-400 mt-1 line-through">Weekly summary of all active campaigns and leads</div>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="rounded-full bg-gray-200 w-6 h-6 flex items-center justify-center">👤</span>
-                      <span className="text-xs text-gray-400">Emma Davis</span>
-                      <span className="text-xs text-gray-400 ml-auto">Completed: Jun 10, 2025</span>
-                    </div>
-                  </div>
-                </div>
-                {/* Task Card 4 */}
-                <div className="flex items-start gap-3 bg-gray-50 rounded p-4">
-                  <input type="checkbox" className="mt-1 accent-gray-400" />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-gray-900">Update social media calendar</span>
-                      <span className="text-xs text-gray-500 bg-gray-100 rounded px-2 py-1 ml-2">Low</span>
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">Plan content for next month's social media posts</div>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="rounded-full bg-gray-200 w-6 h-6 flex items-center justify-center">👤</span>
-                      <span className="text-xs text-gray-500">Alex Smith</span>
-                      <span className="text-xs text-gray-400 ml-auto">Due: Jun 20, 2025</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              )}
             </CardContent>
           </Card>
         </div>
+
         {/* Calendar View (1/3 width) */}
         <div className="flex flex-col gap-6">
-          <Card>
-            <CardContent className="p-0">
-              <div className="flex justify-between items-center px-6 py-4 border-b">
-                <span className="font-semibold text-gray-900">Calendar View</span>
-                <div className="flex items-center gap-2 text-gray-500">
-                  <Button size="icon" variant="ghost" className="text-gray-400"><span className="sr-only">Previous Month</span>&lt;</Button>
-                  <span className="text-sm font-medium">June 2025</span>
-                  <Button size="icon" variant="ghost" className="text-gray-400"><span className="sr-only">Next Month</span>&gt;</Button>
-                </div>
-              </div>
-              {/* Simple Calendar Mockup */}
-              <div className="p-6">
-                <div className="grid grid-cols-7 gap-2 text-xs text-center text-gray-400 mb-2">
-                  <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-                </div>
-                <div className="grid grid-cols-7 gap-2 text-sm">
-                  {/* 1-7 */}
-                  <div className="text-gray-300">1</div><div className="text-gray-300">2</div><div className="text-gray-300">3</div><div className="text-gray-300">4</div><div className="text-gray-300">5</div><div className="text-gray-300">6</div><div className="text-gray-300">7</div>
-                  {/* 8-14 */}
-                  <div className="text-gray-300">8</div><div className="text-gray-900 font-bold">9<div className="w-full h-1 bg-gray-900 rounded mt-1" /></div><div className="text-gray-900 font-bold">10<div className="w-full h-1 bg-gray-500 rounded mt-1" /></div><div className="text-gray-300">11</div><div className="text-gray-300">12</div><div className="text-gray-300">13</div><div className="text-gray-300">14</div>
-                  {/* 15-21 */}
-                  <div className="text-gray-900 font-bold">15<div className="w-full h-1 bg-gray-900 rounded mt-1" /></div><div className="text-gray-300">16</div><div className="text-gray-300">17</div><div className="text-gray-300">18</div><div className="text-gray-300">19</div><div className="text-gray-900 font-bold">20<div className="w-full h-1 bg-gray-500 rounded mt-1" /></div><div className="text-gray-300">21</div>
-                  {/* 22-28 */}
-                  <div className="text-gray-300">22</div><div className="text-gray-300">23</div><div className="text-gray-300">24</div><div className="text-gray-300">25</div><div className="text-gray-300">26</div><div className="text-gray-300">27</div><div className="text-gray-300">28</div>
-                  {/* 29-30 */}
-                  <div className="text-gray-300">29</div><div className="text-gray-300">30</div>
-                </div>
-                {/* Legend */}
-                <div className="flex gap-4 mt-4 text-xs text-gray-500">
-                  <div className="flex items-center gap-1"><span className="w-3 h-1 bg-gray-900 rounded inline-block" /> High Priority</div>
-                  <div className="flex items-center gap-1"><span className="w-3 h-1 bg-gray-500 rounded inline-block" /> Medium Priority</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <TaskCalendar />
         </div>
       </div>
     </div>

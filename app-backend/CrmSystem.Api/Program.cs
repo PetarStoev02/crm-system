@@ -159,6 +159,74 @@ static async Task SeedDatabase(IServiceProvider services)
         if (result.Succeeded)
         {
             Console.WriteLine("Default user created successfully: user1@test.test / password");
+            
+            // Add sample tasks for the default user
+            if (!context.Tasks.Any())
+            {
+                var sampleTasks = new[]
+                {
+                    new CrmSystem.Core.Entities.Task
+                    {
+                        Title = "Review Q2 campaign performance",
+                        Description = "Analyze metrics and prepare summary report for stakeholders",
+                        Status = "In Progress",
+                        Priority = "High",
+                        DueDate = DateTime.UtcNow.AddDays(7),
+                        AssignedToUserId = user.Id,
+                        CreatedByUserId = user.Id,
+                        CreatedAt = DateTime.UtcNow
+                    },
+                    new CrmSystem.Core.Entities.Task
+                    {
+                        Title = "Client presentation preparation",
+                        Description = "Prepare slides for TechCorp quarterly review meeting",
+                        Status = "Pending",
+                        Priority = "Medium",
+                        DueDate = DateTime.UtcNow.AddDays(4),
+                        AssignedToUserId = user.Id,
+                        CreatedByUserId = user.Id,
+                        CreatedAt = DateTime.UtcNow
+                    },
+                    new CrmSystem.Core.Entities.Task
+                    {
+                        Title = "Send weekly performance report",
+                        Description = "Weekly summary of all active campaigns and leads",
+                        Status = "Completed",
+                        Priority = "Medium",
+                        DueDate = DateTime.UtcNow.AddDays(-2),
+                        CompletedAt = DateTime.UtcNow.AddDays(-1),
+                        AssignedToUserId = user.Id,
+                        CreatedByUserId = user.Id,
+                        CreatedAt = DateTime.UtcNow.AddDays(-7)
+                    },
+                    new CrmSystem.Core.Entities.Task
+                    {
+                        Title = "Update social media calendar",
+                        Description = "Plan content for next month's social media posts",
+                        Status = "Pending",
+                        Priority = "Low",
+                        DueDate = DateTime.UtcNow.AddDays(12),
+                        AssignedToUserId = user.Id,
+                        CreatedByUserId = user.Id,
+                        CreatedAt = DateTime.UtcNow
+                    },
+                    new CrmSystem.Core.Entities.Task
+                    {
+                        Title = "Database backup maintenance",
+                        Description = "Perform monthly database backup and verification",
+                        Status = "Pending",
+                        Priority = "High",
+                        DueDate = DateTime.UtcNow.AddDays(-1), // Overdue task
+                        AssignedToUserId = user.Id,
+                        CreatedByUserId = user.Id,
+                        CreatedAt = DateTime.UtcNow.AddDays(-5)
+                    }
+                };
+
+                context.Tasks.AddRange(sampleTasks);
+                await context.SaveChangesAsync();
+                Console.WriteLine("Sample tasks created successfully");
+            }
         }
         else
         {
