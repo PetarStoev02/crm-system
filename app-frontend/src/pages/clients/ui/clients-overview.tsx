@@ -1,9 +1,184 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Users, UserCheck, UserPlus, DollarSign, CheckCircle2 } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import { Users, Search, UserPlus } from 'lucide-react';
+import { clientsAPI, type Client, type ClientsResponse, type ClientStats, type CreateClientRequest } from '@/lib/clients-api';
+import { ClientForm } from './client-form';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+
+type ViewMode = 'list' | 'create' | 'edit';
 
 export function ClientsOverview() {
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [clients, setClients] = useState<Client[]>([]);
+  const [stats, setStats] = useState<ClientStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [formLoading, setFormLoading] = useState(false);
+  const [filters, setFilters] = useState({
+    search: '',
+    status: '',
+    type: '',
+  });
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    total: 0,
+    pageSize: 10,
+  });
+
+  useEffect(() => {
+    if (viewMode === 'list') {
+      fetchClients();
+      fetchStats();
+    }
+  }, [viewMode, filters, pagination.currentPage]);
+
+  const fetchClients = async () => {
+    try {
+      setLoading(true);
+      const response: ClientsResponse = await clientsAPI.getClients({
+        search: filters.search || undefined,
+        status: filters.status || undefined,
+        type: filters.type || undefined,
+        page: pagination.currentPage,
+        pageSize: pagination.pageSize,
+      });
+      
+      setClients(response.clients);
+      setPagination(prev => ({
+        ...prev,
+        total: response.totalCount,
+        totalPages: Math.ceil(response.totalCount / prev.pageSize),
+      }));
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch clients');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const statsData = await clientsAPI.getClientStats();
+      setStats(statsData);
+    } catch (err) {
+      console.error('Failed to fetch client stats:', err);
+    }
+  };
+
+  const handleCreateClient = async (data: CreateClientRequest) => {
+    setFormLoading(true);
+    try {
+      await clientsAPI.createClient(data);
+      setViewMode('list');
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const handleUpdateClient = async (data: CreateClientRequest) => {
+    if (!editingClient) return;
+    
+    setFormLoading(true);
+    try {
+      await clientsAPI.updateClient(editingClient.id, data);
+      setViewMode('list');
+      setEditingClient(null);
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const handleDeleteClient = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this client?')) return;
+    
+    try {
+      await clientsAPI.deleteClient(id);
+      fetchClients();
+      fetchStats();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete client');
+    }
+  };
+
+  const handleFilterChange = (key: keyof typeof filters, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+    setPagination(prev => ({ ...prev, currentPage: 1 }));
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPagination(prev => ({ ...prev, currentPage: newPage }));
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Active': return 'bg-green-100 text-green-800';
+      case 'Inactive': return 'bg-gray-100 text-gray-800';
+      case 'Prospect': return 'bg-yellow-100 text-yellow-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case 'Individual': return 'bg-blue-100 text-blue-800';
+      case 'Business': return 'bg-purple-100 text-purple-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours} hours ago`;
+    if (diffInHours < 48) return 'Yesterday';
+    return date.toLocaleDateString();
+  };
+
+  if (viewMode === 'create') {
+    return (
+      <div className="p-8 bg-gray-50 min-h-screen">
+        <ClientForm
+          onSubmit={handleCreateClient}
+          onCancel={() => setViewMode('list')}
+          isLoading={formLoading}
+        />
+      </div>
+    );
+  }
+
+  if (viewMode === 'edit' && editingClient) {
+    return (
+      <div className="p-8 bg-gray-50 min-h-screen">
+        <ClientForm
+          client={editingClient}
+          onSubmit={handleUpdateClient}
+          onCancel={() => {
+            setViewMode('list');
+            setEditingClient(null);
+          }}
+          isLoading={formLoading}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
       {/* Header */}
@@ -12,46 +187,66 @@ export function ClientsOverview() {
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Client Management</h1>
           <p className="text-gray-500">Manage your client relationships and accounts</p>
         </div>
-        <Button className="bg-gray-900 text-white hover:bg-gray-800 flex items-center gap-2">
+        <Button 
+          onClick={() => setViewMode('create')}
+          className="bg-gray-900 text-white hover:bg-gray-800 flex items-center gap-2"
+        >
           <UserPlus className="w-4 h-4" />
           Add New Client
         </Button>
       </div>
+
+      {error && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
       {/* Filters */}
       <Card className="mb-6">
         <CardContent className="py-4 px-6">
           <div className="flex flex-col md:flex-row gap-4">
-            <Input placeholder="Search clients..." className="w-full md:w-1/4" />
-            <select className="w-full md:w-1/4 border rounded px-3 py-2 text-gray-600 bg-white">
-              <option>All Statuses</option>
-              <option>Active</option>
-              <option>Inactive</option>
-              <option>Pending</option>
+            <div className="relative w-full md:w-1/3">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input 
+                placeholder="Search clients..." 
+                value={filters.search}
+                onChange={(e) => handleFilterChange('search', e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <select 
+              value={filters.status}
+              onChange={(e) => handleFilterChange('status', e.target.value)}
+              className="w-full md:w-1/3 border rounded px-3 py-2 text-gray-600 bg-white"
+            >
+              <option value="">All Statuses</option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+              <option value="Prospect">Prospect</option>
             </select>
-            <select className="w-full md:w-1/4 border rounded px-3 py-2 text-gray-600 bg-white">
-              <option>All Industries</option>
-              <option>Technology</option>
-              <option>Healthcare</option>
-              <option>E-commerce</option>
-              <option>Education</option>
-            </select>
-            <select className="w-full md:w-1/4 border rounded px-3 py-2 text-gray-600 bg-white">
-              <option>All Managers</option>
-              <option>Sarah Johnson</option>
-              <option>Michael Chen</option>
-              <option>Emma Davis</option>
-              <option>Alex Smith</option>
+            <select 
+              value={filters.type}
+              onChange={(e) => handleFilterChange('type', e.target.value)}
+              className="w-full md:w-1/3 border rounded px-3 py-2 text-gray-600 bg-white"
+            >
+              <option value="">All Types</option>
+              <option value="Individual">Individual</option>
+              <option value="Business">Business</option>
             </select>
           </div>
         </CardContent>
       </Card>
+
       {/* Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <Card>
           <CardContent className="flex flex-col gap-2 py-4">
             <span className="text-gray-500 text-sm">Total Clients</span>
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-gray-900">156</span>
+              <span className="text-2xl font-bold text-gray-900">
+                {stats ? stats.totalClients.toLocaleString() : '--'}
+              </span>
               <Users className="w-5 h-5 text-gray-400" />
             </div>
           </CardContent>
@@ -60,193 +255,209 @@ export function ClientsOverview() {
           <CardContent className="flex flex-col gap-2 py-4">
             <span className="text-gray-500 text-sm">Active Clients</span>
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-gray-900">142</span>
-              <UserCheck className="w-5 h-5 text-gray-400" />
+              <span className="text-2xl font-bold text-gray-900">
+                {stats ? stats.activeClients.toLocaleString() : '--'}
+              </span>
+              <Users className="w-5 h-5 text-gray-400" />
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="flex flex-col gap-2 py-4">
-            <span className="text-gray-500 text-sm">Monthly Revenue</span>
+            <span className="text-gray-500 text-sm">Total Revenue</span>
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-gray-900">$98.5K</span>
-              <DollarSign className="w-5 h-5 text-gray-400" />
+              <span className="text-2xl font-bold text-gray-900">
+                {stats ? formatCurrency(stats.totalRevenue) : '--'}
+              </span>
+              <Users className="w-5 h-5 text-gray-400" />
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="flex flex-col gap-2 py-4">
-            <span className="text-gray-500 text-sm">New This Month</span>
+            <span className="text-gray-500 text-sm">Outstanding</span>
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-gray-900">8</span>
-              <UserPlus className="w-5 h-5 text-gray-400" />
+              <span className="text-2xl font-bold text-gray-900">
+                {stats ? formatCurrency(stats.outstandingAmount) : '--'}
+              </span>
+              <Users className="w-5 h-5 text-gray-400" />
             </div>
           </CardContent>
         </Card>
       </div>
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Client List (2/3 width) */}
-        <div className="lg:col-span-2 flex flex-col gap-6">
-          <Card>
-            <CardContent className="p-0">
-              <div className="flex justify-between items-center px-6 py-4 border-b">
-                <span className="font-semibold text-gray-900">Client List</span>
-                <div className="flex gap-2">
-                  <Button variant="outline" className="border-gray-200 text-gray-600">Filter</Button>
-                  <Button variant="outline" className="border-gray-200 text-gray-600">Export</Button>
-                </div>
+
+      {/* Clients Table */}
+      <Card>
+        <CardContent className="p-0">
+          <div className="flex justify-between items-center px-6 py-4 border-b">
+            <span className="font-semibold text-gray-900">
+              All Clients ({pagination.total})
+            </span>
+          </div>
+
+          {loading ? (
+            <div className="p-8 text-center">
+              <div className="text-gray-400 text-6xl mb-4">⏳</div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Loading clients...</h3>
+              <p className="text-gray-600">Please wait while we fetch your client data.</p>
+            </div>
+          ) : clients.length === 0 ? (
+            <div className="p-8 text-center">
+              <div className="text-gray-400 text-6xl mb-4">📋</div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No clients found</h3>
+              <p className="text-gray-600 mb-4">Get started by adding your first client.</p>
+              <Button
+                onClick={() => setViewMode('create')}
+                className="bg-gray-900 text-white hover:bg-gray-800"
+              >
+                Add Client
+              </Button>
+            </div>
+          ) : (
+            <>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Client
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Contact
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Type
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Revenue
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Created
+                      </th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {clients.map((client) => (
+                      <tr key={client.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">
+                              {client.firstName} {client.lastName}
+                            </div>
+                            <div className="text-sm text-gray-500">{client.company}</div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">{client.email}</div>
+                          <div className="text-sm text-gray-500">{client.phone}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(client.status)}`}>
+                            {client.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTypeColor(client.type)}`}>
+                            {client.type}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {formatCurrency(client.totalValue)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {formatDate(client.createdAt)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <div className="flex items-center justify-end gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setEditingClient(client);
+                                setViewMode('edit');
+                              }}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeleteClient(client.id)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-              <div className="flex flex-col gap-3 px-6 py-4">
-                {/* Client Card 1 */}
-                <div className="flex items-center justify-between bg-gray-50 rounded p-4">
-                  <div>
-                    <div className="font-medium text-gray-900">TechCorp Solutions</div>
-                    <div className="text-xs text-gray-500">Technology • 3 active campaigns</div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="rounded-full bg-gray-200 w-6 h-6 flex items-center justify-center">👤</span>
-                      <span className="text-xs text-gray-500">Sarah Johnson</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <span className="text-gray-900 font-semibold">$12.5K/month</span>
-                    <span className="text-xs text-gray-400">Since Jan 2024</span>
-                    <span className="text-xs text-green-600 font-medium">Active</span>
-                  </div>
-                </div>
-                {/* Client Card 2 */}
-                <div className="flex items-center justify-between bg-gray-50 rounded p-4">
-                  <div>
-                    <div className="font-medium text-gray-900">HealthFirst Medical</div>
-                    <div className="text-xs text-gray-500">Healthcare • 2 active campaigns</div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="rounded-full bg-gray-200 w-6 h-6 flex items-center justify-center">👤</span>
-                      <span className="text-xs text-gray-500">Michael Chen</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <span className="text-gray-900 font-semibold">$8.2K/month</span>
-                    <span className="text-xs text-gray-400">Since Mar 2024</span>
-                    <span className="text-xs text-green-600 font-medium">Active</span>
-                  </div>
-                </div>
-                {/* Client Card 3 */}
-                <div className="flex items-center justify-between bg-gray-50 rounded p-4">
-                  <div>
-                    <div className="font-medium text-gray-900">GrowthCo Retail</div>
-                    <div className="text-xs text-gray-500">E-commerce • 5 active campaigns</div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="rounded-full bg-gray-200 w-6 h-6 flex items-center justify-center">👤</span>
-                      <span className="text-xs text-gray-500">Emma Davis</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <span className="text-gray-900 font-semibold">$15.8K/month</span>
-                    <span className="text-xs text-gray-400">Since Dec 2023</span>
-                    <span className="text-xs text-green-600 font-medium">Active</span>
-                  </div>
-                </div>
-                {/* Client Card 4 */}
-                <div className="flex items-center justify-between bg-gray-50 rounded p-4">
-                  <div>
-                    <div className="font-medium text-gray-900">EduTech Institute</div>
-                    <div className="text-xs text-gray-500">Education • 1 active campaign</div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="rounded-full bg-gray-200 w-6 h-6 flex items-center justify-center">👤</span>
-                      <span className="text-xs text-gray-500">Alex Smith</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <span className="text-gray-900 font-semibold">$6.5K/month</span>
-                    <span className="text-xs text-gray-400">Since May 2025</span>
-                    <span className="text-xs text-yellow-600 font-medium">Pending</span>
-                  </div>
-                </div>
-              </div>
+
               {/* Pagination */}
-              <div className="flex items-center justify-between px-6 py-4 border-t bg-gray-50 text-sm text-gray-500">
-                <span>Showing 1-4 of 156 clients</span>
-                <div className="flex gap-1">
-                  <Button size="sm" variant="ghost" className="text-gray-400">Previous</Button>
-                  <Button size="sm" variant="ghost" className="bg-gray-200 text-gray-900">1</Button>
-                  <Button size="sm" variant="ghost" className="text-gray-400">2</Button>
-                  <Button size="sm" variant="ghost" className="text-gray-400">3</Button>
-                  <Button size="sm" variant="ghost" className="text-gray-400">Next</Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        {/* Right Column (1/3 width) */}
-        <div className="flex flex-col gap-6">
-          {/* Recent Activities */}
-          <Card>
-            <CardContent className="p-0">
-              <div className="px-6 py-4 border-b font-semibold text-gray-900">Recent Activities</div>
-              <div className="flex flex-col gap-3 px-6 py-4">
-                <div className="flex items-center gap-2 text-gray-600 text-sm">
-                  <CheckCircle2 className="w-4 h-4 text-green-500" />
-                  <span>New client onboarded</span>
-                  <span className="text-xs text-gray-400 ml-auto">TechStart Inc. • 2 hours ago</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-600 text-sm">
-                  <CheckCircle2 className="w-4 h-4 text-blue-500" />
-                  <span>Contract updated</span>
-                  <span className="text-xs text-gray-400 ml-auto">GrowthCo Retail • 4 hours ago</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-600 text-sm">
-                  <CheckCircle2 className="w-4 h-4 text-gray-400" />
-                  <span>Payment received</span>
-                  <span className="text-xs text-gray-400 ml-auto">HealthFirst Medical • 1 day ago</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          {/* Top Performing Clients */}
-          <Card>
-            <CardContent className="p-0">
-              <div className="px-6 py-4 border-b font-semibold text-gray-900">Top Performing Clients</div>
-              <div className="flex flex-col gap-3 px-6 py-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="bg-gray-200 text-gray-700 rounded px-2 py-1 text-xs font-semibold">TC</span>
-                    <span className="text-gray-900 font-medium">TechCorp</span>
-                    <span className="text-xs text-gray-400">95% satisfaction</span>
+              {pagination.totalPages > 1 && (
+                <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 flex justify-between sm:hidden">
+                      <Button
+                        variant="outline"
+                        onClick={() => handlePageChange(Math.max(1, pagination.currentPage - 1))}
+                        disabled={pagination.currentPage === 1}
+                      >
+                        Previous
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => handlePageChange(Math.min(pagination.totalPages, pagination.currentPage + 1))}
+                        disabled={pagination.currentPage === pagination.totalPages}
+                      >
+                        Next
+                      </Button>
+                    </div>
+                    <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                      <div>
+                        <p className="text-sm text-gray-700">
+                          Showing page <span className="font-medium">{pagination.currentPage}</span> of{' '}
+                          <span className="font-medium">{pagination.totalPages}</span>
+                        </p>
+                      </div>
+                      <div>
+                        <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                          <Button
+                            variant="outline"
+                            onClick={() => handlePageChange(Math.max(1, pagination.currentPage - 1))}
+                            disabled={pagination.currentPage === 1}
+                            className="rounded-l-md"
+                          >
+                            Previous
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={() => handlePageChange(Math.min(pagination.totalPages, pagination.currentPage + 1))}
+                            disabled={pagination.currentPage === pagination.totalPages}
+                            className="rounded-r-md"
+                          >
+                            Next
+                          </Button>
+                        </nav>
+                      </div>
+                    </div>
                   </div>
-                  <span className="text-gray-900 font-semibold">$12.5K</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="bg-gray-200 text-gray-700 rounded px-2 py-1 text-xs font-semibold">GC</span>
-                    <span className="text-gray-900 font-medium">GrowthCo</span>
-                    <span className="text-xs text-gray-400">92% satisfaction</span>
-                  </div>
-                  <span className="text-gray-900 font-semibold">$15.8K</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="bg-gray-200 text-gray-700 rounded px-2 py-1 text-xs font-semibold">HF</span>
-                    <span className="text-gray-900 font-medium">HealthFirst</span>
-                    <span className="text-xs text-gray-400">88% satisfaction</span>
-                  </div>
-                  <span className="text-gray-900 font-semibold">$8.2K</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          {/* Quick Actions */}
-          <Card>
-            <CardContent className="p-0">
-              <div className="px-6 py-4 border-b font-semibold text-gray-900">Quick Actions</div>
-              <div className="flex flex-col gap-2 px-6 py-4">
-                <Button variant="outline" className="justify-start text-gray-700"><span>Generate Invoice</span></Button>
-                <Button variant="outline" className="justify-start text-gray-700"><span>Send Newsletter</span></Button>
-                <Button variant="outline" className="justify-start text-gray-700"><span>View Reports</span></Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+              )}
+            </>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
-} 
+}
+
+export default ClientsOverview; 

@@ -13,6 +13,7 @@ import type { CreateFileRoute, FileRoutesByPath } from '@tanstack/react-router'
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ClientsRouteImport } from './routes/clients'
 import { Route as AuthedRouteImport } from './routes/authed'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthedIndexRouteImport } from './routes/authed/index'
@@ -34,6 +35,11 @@ const RegisterRoute = RegisterRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClientsRoute = ClientsRouteImport.update({
+  id: '/clients',
+  path: '/clients',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthedRoute = AuthedRouteImport.update({
@@ -101,6 +107,7 @@ const AuthedSettingsAccountSettingsRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/authed': typeof AuthedRouteWithChildren
+  '/clients': typeof ClientsRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/authed/campaigns': typeof AuthedCampaignsRoute
@@ -116,6 +123,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/clients': typeof ClientsRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/authed/campaigns': typeof AuthedCampaignsRoute
@@ -133,6 +141,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/authed': typeof AuthedRouteWithChildren
+  '/clients': typeof ClientsRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/authed/campaigns': typeof AuthedCampaignsRoute
@@ -151,6 +160,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/authed'
+    | '/clients'
     | '/login'
     | '/register'
     | '/authed/campaigns'
@@ -166,6 +176,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/clients'
     | '/login'
     | '/register'
     | '/authed/campaigns'
@@ -182,6 +193,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/authed'
+    | '/clients'
     | '/login'
     | '/register'
     | '/authed/campaigns'
@@ -199,6 +211,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthedRoute: typeof AuthedRouteWithChildren
+  ClientsRoute: typeof ClientsRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
   SettingsAccountSettingsRoute: typeof SettingsAccountSettingsRoute
@@ -218,6 +231,13 @@ declare module '@tanstack/react-router' {
       path: '/authed'
       fullPath: '/authed'
       preLoaderRoute: typeof AuthedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clients': {
+      id: '/clients'
+      path: '/clients'
+      fullPath: '/clients'
+      preLoaderRoute: typeof ClientsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -323,6 +343,15 @@ declare module './routes/authed' {
     FileRoutesByPath['/authed']['id'],
     FileRoutesByPath['/authed']['path'],
     FileRoutesByPath['/authed']['fullPath']
+  >
+}
+declare module './routes/clients' {
+  const createFileRoute: CreateFileRoute<
+    '/clients',
+    FileRoutesByPath['/clients']['parentRoute'],
+    FileRoutesByPath['/clients']['id'],
+    FileRoutesByPath['/clients']['path'],
+    FileRoutesByPath['/clients']['fullPath']
   >
 }
 declare module './routes/login' {
@@ -464,6 +493,7 @@ const AuthedRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthedRoute: AuthedRouteWithChildren,
+  ClientsRoute: ClientsRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
   SettingsAccountSettingsRoute: SettingsAccountSettingsRoute,

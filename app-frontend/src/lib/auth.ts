@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { API_BASE_URL } from './config';
 
-const API_BASE_URL = 'http://localhost:5001/api';
+const API_URL = `${API_BASE_URL}/api`;
 
 export interface LoginRequest {
   email: string;
@@ -55,7 +56,7 @@ class AuthService {
 
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     try {
-      const response = await axios.post<LoginResponse>(`${API_BASE_URL}/auth/login`, credentials);
+      const response = await axios.post<LoginResponse>(`${API_URL}/auth/login`, credentials);
       const data = response.data;
       
       // Store token and user data
@@ -80,7 +81,7 @@ class AuthService {
 
   async register(userData: RegisterRequest): Promise<void> {
     try {
-      await axios.post(`${API_BASE_URL}/auth/register`, userData);
+      await axios.post(`${API_URL}/auth/register`, userData);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 400) {
         throw new Error('User with this email already exists');

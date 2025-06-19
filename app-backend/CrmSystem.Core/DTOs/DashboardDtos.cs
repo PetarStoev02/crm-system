@@ -5,14 +5,20 @@ public record DashboardOverviewDto(
     List<RecentCampaignDto> RecentCampaigns,
     List<UpcomingTaskDto> UpcomingTasks,
     List<HighPriorityLeadDto> HighPriorityLeads,
-    List<TeamActivityDto> TeamActivity
+    List<TeamActivityDto> TeamActivity,
+    List<TopClientDto> TopClients,
+    List<RecentInvoiceDto> RecentInvoices
 );
 
 public record DashboardStatsDto(
     int ActiveCampaigns,
     int TotalLeads,
     decimal ConversionRate,
-    decimal MonthlyROI
+    decimal MonthlyROI,
+    int TotalClients,
+    decimal TotalRevenue,
+    decimal OutstandingAmount,
+    int OverdueInvoices
 );
 
 public record RecentCampaignDto(
@@ -48,4 +54,25 @@ public record TeamActivityDto(
     string Activity,
     DateTime Timestamp,
     string EntityType
+);
+
+public record TopClientDto(
+    int Id,
+    string FirstName,
+    string LastName,
+    string Company,
+    decimal TotalValue,
+    decimal OutstandingBalance,
+    string Status
+);
+
+public record RecentInvoiceDto(
+    int Id,
+    string InvoiceNumber,
+    string ClientName,
+    decimal Total,
+    decimal AmountDue,
+    string Status,
+    DateTime DueDate,
+    bool IsOverdue
 ); 

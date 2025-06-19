@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { authService } from '@/lib/auth';
+import { API_BASE_URL } from './config';
 
-const API_BASE_URL = 'http://localhost:5001/api';
+const API_URL = `${API_BASE_URL}/api`;
 
 // Fallback function to ensure auth headers are included
 const getConfig = () => {
@@ -90,7 +91,7 @@ class LeadsAPIService {
       if (filters.page) params.append('page', filters.page.toString());
       if (filters.limit) params.append('limit', filters.limit.toString());
 
-      const response = await axios.get<LeadsResponse>(`${API_BASE_URL}/leads?${params}`, getConfig());
+      const response = await axios.get<LeadsResponse>(`${API_URL}/leads?${params}`, getConfig());
       return response.data;
     } catch (error) {
       console.error('Failed to fetch leads:', error);
@@ -100,7 +101,7 @@ class LeadsAPIService {
 
   async getLead(id: number): Promise<Lead> {
     try {
-      const response = await axios.get<Lead>(`${API_BASE_URL}/leads/${id}`, getConfig());
+      const response = await axios.get<Lead>(`${API_URL}/leads/${id}`, getConfig());
       return response.data;
     } catch (error) {
       console.error('Failed to fetch lead:', error);
@@ -111,7 +112,7 @@ class LeadsAPIService {
   async createLead(leadData: CreateLeadRequest): Promise<Lead> {
     try {
       const config = getConfig();
-      const response = await axios.post<Lead>(`${API_BASE_URL}/leads`, leadData, config);
+      const response = await axios.post<Lead>(`${API_URL}/leads`, leadData, config);
       return response.data;
     } catch (error) {
       console.error('Failed to create lead:', error);
@@ -125,7 +126,7 @@ class LeadsAPIService {
   async updateLead(id: number, leadData: UpdateLeadRequest): Promise<Lead> {
     try {
       const config = getConfig();
-      const response = await axios.put<Lead>(`${API_BASE_URL}/leads/${id}`, leadData, config);
+      const response = await axios.put<Lead>(`${API_URL}/leads/${id}`, leadData, config);
       return response.data;
     } catch (error) {
       console.error('Failed to update lead:', error);
@@ -135,7 +136,7 @@ class LeadsAPIService {
 
   async deleteLead(id: number): Promise<void> {
     try {
-      await axios.delete(`${API_BASE_URL}/leads/${id}`, getConfig());
+      await axios.delete(`${API_URL}/leads/${id}`, getConfig());
     } catch (error) {
       console.error('Failed to delete lead:', error);
       throw new Error('Failed to delete lead');
@@ -144,7 +145,7 @@ class LeadsAPIService {
 
   async getLeadStats(): Promise<LeadStats> {
     try {
-      const response = await axios.get<LeadStats>(`${API_BASE_URL}/leads/stats`, getConfig());
+      const response = await axios.get<LeadStats>(`${API_URL}/leads/stats`, getConfig());
       return response.data;
     } catch (error) {
       console.error('Failed to fetch lead stats:', error);
@@ -155,7 +156,7 @@ class LeadsAPIService {
   async markAsContacted(id: number): Promise<Lead> {
     try {
       const config = getConfig();
-      const response = await axios.post<Lead>(`${API_BASE_URL}/leads/${id}/contact`, {}, config);
+      const response = await axios.post<Lead>(`${API_URL}/leads/${id}/contact`, {}, config);
       return response.data;
     } catch (error) {
       console.error('Failed to mark lead as contacted:', error);
@@ -166,7 +167,7 @@ class LeadsAPIService {
   async bulkUpdateStatus(leadIds: number[], status: string): Promise<void> {
     try {
       const config = getConfig();
-      await axios.post(`${API_BASE_URL}/leads/bulk-update-status`, {
+      await axios.post(`${API_URL}/leads/bulk-update-status`, {
         leadIds,
         status
       }, config);

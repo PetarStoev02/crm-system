@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { authService } from '@/lib/auth';
+import { API_BASE_URL } from './config';
 
-const API_BASE_URL = 'http://localhost:5001/api';
+const API_URL = `${API_BASE_URL}/api`;
 
 // Fallback function to ensure auth headers are included
 const getConfig = () => {
@@ -18,6 +19,10 @@ export interface DashboardStats {
   totalLeads: number;
   conversionRate: number;
   monthlyROI: number;
+  totalClients: number;
+  totalRevenue: number;
+  outstandingAmount: number;
+  overdueInvoices: number;
 }
 
 export interface RecentCampaign {
@@ -55,18 +60,41 @@ export interface TeamActivity {
   entityType: string;
 }
 
+export interface TopClient {
+  id: number;
+  firstName: string;
+  lastName: string;
+  company: string;
+  totalValue: number;
+  outstandingBalance: number;
+  status: string;
+}
+
+export interface RecentInvoice {
+  id: number;
+  invoiceNumber: string;
+  clientName: string;
+  total: number;
+  amountDue: number;
+  status: string;
+  dueDate: string;
+  isOverdue: boolean;
+}
+
 export interface DashboardOverview {
   stats: DashboardStats;
   recentCampaigns: RecentCampaign[];
   upcomingTasks: UpcomingTask[];
   highPriorityLeads: HighPriorityLead[];
   teamActivity: TeamActivity[];
+  topClients: TopClient[];
+  recentInvoices: RecentInvoice[];
 }
 
 class DashboardAPIService {
   async getDashboardOverview(): Promise<DashboardOverview> {
     try {
-      const response = await axios.get<DashboardOverview>(`${API_BASE_URL}/dashboard/overview`, getConfig());
+      const response = await axios.get<DashboardOverview>(`${API_URL}/dashboard/overview`, getConfig());
       return response.data;
     } catch (error) {
       console.error('Failed to fetch dashboard overview:', error);

@@ -10,17 +10,20 @@ public class AppDbContext : IdentityDbContext<User>
     public DbSet<Lead> Leads { get; set; }
     public DbSet<Campaign> Campaigns { get; set; }
     public DbSet<Task> Tasks { get; set; }
+    public DbSet<Client> Clients { get; set; }
+    public DbSet<Invoice> Invoices { get; set; }
+    public DbSet<InvoiceItem> InvoiceItems { get; set; }
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
 
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(builder);
+        base.OnModelCreating(modelBuilder);
 
         // Configure User entity
-        builder.Entity<User>(entity =>
+        modelBuilder.Entity<User>(entity =>
         {
             entity.Property(e => e.FirstName)
                 .HasMaxLength(100)
@@ -35,7 +38,7 @@ public class AppDbContext : IdentityDbContext<User>
         });
 
         // Configure Lead entity
-        builder.Entity<Lead>(entity =>
+        modelBuilder.Entity<Lead>(entity =>
         {
             entity.HasKey(e => e.Id);
             
@@ -79,7 +82,7 @@ public class AppDbContext : IdentityDbContext<User>
         });
 
         // Configure Campaign entity
-        builder.Entity<Campaign>(entity =>
+        modelBuilder.Entity<Campaign>(entity =>
         {
             entity.HasKey(e => e.Id);
 
@@ -108,7 +111,7 @@ public class AppDbContext : IdentityDbContext<User>
         });
 
         // Configure Task entity
-        builder.Entity<Task>(entity =>
+        modelBuilder.Entity<Task>(entity =>
         {
             entity.HasKey(e => e.Id);
 
@@ -143,6 +146,90 @@ public class AppDbContext : IdentityDbContext<User>
                 .WithMany()
                 .HasForeignKey(e => e.RelatedCampaignId)
                 .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // Client configuration
+        modelBuilder.Entity<Client>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.FirstName).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.LastName).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Company).HasMaxLength(100);
+            entity.Property(e => e.Email).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Phone).HasMaxLength(20);
+            entity.Property(e => e.Address).HasMaxLength(200);
+            entity.Property(e => e.City).HasMaxLength(50);
+            entity.Property(e => e.State).HasMaxLength(50);
+            entity.Property(e => e.PostalCode).HasMaxLength(20);
+            entity.Property(e => e.Country).HasMaxLength(50);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.Type).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.TotalValue).HasPrecision(18, 2);
+            entity.Property(e => e.OutstandingBalance).HasPrecision(18, 2);
+            entity.Property(e => e.AssignedToUserId).IsRequired();
+
+            entity.HasOne(e => e.AssignedToUser)
+                .WithMany()
+                .HasForeignKey(e => e.AssignedToUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasMany(e => e.Invoices)
+                .WithOne(i => i.Client)
+                .HasForeignKey(i => i.ClientId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Invoice configuration
+        modelBuilder.Entity<Invoice>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.InvoiceNumber).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.SubTotal).HasPrecision(18, 2);
+            entity.Property(e => e.TaxRate).HasPrecision(5, 2);
+            entity.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            entity.Property(e => e.Total).HasPrecision(18, 2);
+            entity.Property(e => e.AmountPaid).HasPrecision(18, 2);
+            entity.Property(e => e.AmountDue).HasPrecision(18, 2);
+            entity.Property(e => e.Currency).IsRequired().HasMaxLength(10);
+            entity.Property(e => e.PaymentMethod).HasMaxLength(50);
+            entity.Property(e => e.CreatedByUserId).IsRequired();
+
+            entity.HasOne(e => e.Client)
+                .WithMany(c => c.Invoices)
+                .HasForeignKey(e => e.ClientId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(e => e.CreatedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasMany(e => e.Items)
+                .WithOne(i => i.Invoice)
+                .HasForeignKey(i => i.InvoiceId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // InvoiceItem configuration
+        modelBuilder.Entity<InvoiceItem>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Description).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.UnitPrice).HasPrecision(18, 2);
+            entity.Property(e => e.Total).HasPrecision(18, 2);
+
+            entity.HasOne(e => e.Invoice)
+                .WithMany(i => i.Items)
+                .HasForeignKey(e => e.InvoiceId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // User configuration
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.Property(e => e.FirstName).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.LastName).IsRequired().HasMaxLength(50);
         });
     }
 } 
