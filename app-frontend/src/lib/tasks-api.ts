@@ -190,7 +190,7 @@ export const tasksAPI = {
   }>> {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/api/tasks?limit=1000&status=Pending,In Progress`,
+        `${API_BASE_URL}/api/tasks?limit=1000`,
         getConfig()
       );
       return response.data.tasks

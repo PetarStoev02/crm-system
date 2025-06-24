@@ -22,17 +22,17 @@ interface TaskEvent {
 }
 
 interface TaskCalendarProps {
-  mode?: 'compact' | 'full';
   onTaskSelect?: (task: TaskEvent) => void;
+  refreshTrigger?: number; // Used to trigger refresh from parent
 }
 
-export function TaskCalendar({ mode = 'compact', onTaskSelect }: TaskCalendarProps) {
+export function TaskCalendar({ onTaskSelect, refreshTrigger }: TaskCalendarProps) {
   const [tasks, setTasks] = useState<TaskEvent[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchTasks();
-  }, []);
+  }, [refreshTrigger]);
 
   const fetchTasks = async () => {
     try {
@@ -81,6 +81,8 @@ export function TaskCalendar({ mode = 'compact', onTaskSelect }: TaskCalendarPro
     switch (status.toLowerCase()) {
       case 'in progress':
         return 'bg-orange-500';
+      case 'pending':
+        return 'bg-gray-500';
       case 'todo':
         return 'bg-gray-500';
       default:
@@ -88,12 +90,14 @@ export function TaskCalendar({ mode = 'compact', onTaskSelect }: TaskCalendarPro
     }
   };
 
-  const getStatusBadgeVariant = (status: string) => {
+  const getStatusBadgeVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
     switch (status.toLowerCase()) {
       case 'completed':
         return 'default';
       case 'in progress':
         return 'secondary';
+      case 'pending':
+        return 'outline';
       case 'todo':
         return 'outline';
       default:
@@ -117,7 +121,7 @@ export function TaskCalendar({ mode = 'compact', onTaskSelect }: TaskCalendarPro
           )}
         </div>
       </div>
-      <Badge variant={getStatusBadgeVariant(task.status) as any} className="text-xs">
+      <Badge variant={getStatusBadgeVariant(task.status)} className="text-xs">
         {task.status}
       </Badge>
     </div>
@@ -127,7 +131,8 @@ export function TaskCalendar({ mode = 'compact', onTaskSelect }: TaskCalendarPro
     { color: 'bg-red-500', label: 'High Priority' },
     { color: 'bg-yellow-500', label: 'Medium Priority' },
     { color: 'bg-green-500', label: 'Low Priority' },
-    { color: 'bg-blue-500', label: 'Completed' }
+    { color: 'bg-blue-500', label: 'Completed' },
+    { color: 'bg-orange-500', label: 'In Progress' }
   ];
 
   // Convert tasks to CalendarItem format
@@ -144,7 +149,6 @@ export function TaskCalendar({ mode = 'compact', onTaskSelect }: TaskCalendarPro
       title="Task Calendar"
       items={calendarItems}
       loading={loading}
-      mode={mode}
       onItemSelect={(item) => onTaskSelect && onTaskSelect(item as TaskEvent)}
       getItemsForDate={getTasksForDate}
       getStatusColor={getStatusColor}

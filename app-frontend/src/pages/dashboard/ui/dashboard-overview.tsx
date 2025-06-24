@@ -387,7 +387,7 @@ export function DashboardOverview() {
 
         {/* Right Column - Calendar */}
         <div className="flex flex-col gap-6">
-          <TaskCalendar compact={true} />
+          <TaskCalendar />
         </div>
       </div>
     </div>

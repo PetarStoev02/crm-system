@@ -402,13 +402,16 @@ export function TasksOverview() {
 
         {/* Calendar View (1/3 width) */}
         <div className="flex flex-col gap-6">
-          <TaskCalendar mode="full" onTaskSelect={(taskEvent) => {
-            // Find the full task object from our tasks array
-            const fullTask = tasks.find(t => t.id === taskEvent.id);
-            if (fullTask) {
-              handleEditTask(fullTask);
-            }
-          }} />
+          <TaskCalendar 
+            refreshTrigger={tasks.length}
+            onTaskSelect={(taskEvent) => {
+              // Find the full task object from our tasks array
+              const fullTask = tasks.find(t => t.id === taskEvent.id);
+              if (fullTask) {
+                handleEditTask(fullTask);
+              }
+            }} 
+          />
         </div>
       </div>
     </div>

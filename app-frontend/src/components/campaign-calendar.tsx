@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { format, isSameDay, parseISO } from 'date-fns';
+import { isSameDay, parseISO } from 'date-fns';
 import { campaignsAPI } from '@/lib/campaigns-api';
 import { CalendarWidget, type CalendarItem } from './calendar-widget';
 
@@ -14,11 +14,10 @@ interface CampaignEvent {
 }
 
 interface CampaignCalendarProps {
-  mode?: 'compact' | 'full';
   onCampaignSelect?: (campaign: CampaignEvent) => void;
 }
 
-export function CampaignCalendar({ mode = 'compact', onCampaignSelect }: CampaignCalendarProps) {
+export function CampaignCalendar({ onCampaignSelect }: CampaignCalendarProps) {
   const [campaigns, setCampaigns] = useState<CampaignEvent[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -71,7 +70,7 @@ export function CampaignCalendar({ mode = 'compact', onCampaignSelect }: Campaig
     }
   };
 
-  const getStatusBadgeVariant = (status: string) => {
+  const getStatusBadgeVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
     switch (status.toLowerCase()) {
       case 'active':
         return 'default';
@@ -98,7 +97,7 @@ export function CampaignCalendar({ mode = 'compact', onCampaignSelect }: Campaig
         <h5 className="font-medium text-sm text-gray-900">{campaign.name}</h5>
         <p className="text-xs text-gray-500">{campaign.type}</p>
       </div>
-      <Badge variant={getStatusBadgeVariant(campaign.status) as any} className="text-xs">
+      <Badge variant={getStatusBadgeVariant(campaign.status)} className="text-xs">
         {campaign.status}
       </Badge>
     </div>
@@ -128,7 +127,6 @@ export function CampaignCalendar({ mode = 'compact', onCampaignSelect }: Campaig
       title="Campaign Calendar"
       items={calendarItems}
       loading={loading}
-      mode={mode}
       onItemSelect={(item) => onCampaignSelect && onCampaignSelect(item as CampaignEvent)}
       getItemsForDate={getCampaignsForDate}
       getStatusColor={getStatusColor}

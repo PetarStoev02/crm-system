@@ -396,7 +396,7 @@ export function CampaignsOverview() {
         
         {/* Campaign Calendar (1/3 width) */}
         <div className="flex flex-col gap-6">
-          <CampaignCalendar mode="compact" />
+          <CampaignCalendar />
         </div>
       </div>
 
