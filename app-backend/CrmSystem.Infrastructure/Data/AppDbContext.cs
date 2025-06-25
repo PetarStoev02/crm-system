@@ -13,6 +13,7 @@ public class AppDbContext : IdentityDbContext<User>
     public DbSet<Client> Clients { get; set; }
     public DbSet<Invoice> Invoices { get; set; }
     public DbSet<InvoiceItem> InvoiceItems { get; set; }
+    public DbSet<Communication> Communications { get; set; }
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
@@ -230,6 +231,39 @@ public class AppDbContext : IdentityDbContext<User>
         {
             entity.Property(e => e.FirstName).IsRequired().HasMaxLength(50);
             entity.Property(e => e.LastName).IsRequired().HasMaxLength(50);
+        });
+
+        // Communication configuration
+        modelBuilder.Entity<Communication>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Type).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Subject).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.Content).HasMaxLength(5000);
+            entity.Property(e => e.Direction).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Priority).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.Notes).HasMaxLength(2000);
+            entity.Property(e => e.Tags).HasMaxLength(500);
+            entity.Property(e => e.Duration).HasMaxLength(100);
+            entity.Property(e => e.Location).HasMaxLength(500);
+            entity.Property(e => e.Attendees).HasMaxLength(1000);
+            entity.Property(e => e.UserId).IsRequired();
+
+            entity.HasOne(e => e.Client)
+                .WithMany()
+                .HasForeignKey(e => e.ClientId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.Lead)
+                .WithMany()
+                .HasForeignKey(e => e.LeadId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 } 
