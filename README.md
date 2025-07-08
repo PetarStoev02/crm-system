@@ -39,7 +39,7 @@ A modern, full-stack CRM system built with React, TypeScript, and .NET Core.
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/crm-system.git
+   git clone https://github.com/petarstoev02/crm-system.git
    cd crm-system
    ```
 
@@ -76,7 +76,7 @@ The frontend is automatically deployed to GitHub Pages when you push to the `mai
 2. **Set the source** to "GitHub Actions"
 3. **Push your changes** to trigger deployment
 
-The site will be available at: `https://yourusername.github.io/crm-system/`
+The site will be available at: `https://petarstoev02.github.io/crm-system/`
 
 ### Backend Deployment
 
@@ -183,7 +183,7 @@ If you encounter any issues:
 Want to get started quickly? Just run:
 
 ```bash
-git clone https://github.com/yourusername/crm-system.git
+git clone https://github.com/petarstoev02/crm-system.git
 cd crm-system
 cd app-backend/CrmSystem.Api && dotnet run &
 cd app-frontend && pnpm install && pnpm run dev

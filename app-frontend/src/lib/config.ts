@@ -6,7 +6,7 @@ const getApiBaseUrl = () => {
   }
   
   // Check if we're on GitHub Pages
-  if (window.location.hostname === 'petarstoev.github.io' || 
+  if (window.location.hostname === 'petarstoev02.github.io' || 
       window.location.hostname.includes('github.io')) {
     // For GitHub Pages, you'll need to deploy your backend separately
     // You can use services like Railway, Render, or Azure
