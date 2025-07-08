@@ -1,0 +1,35 @@
+# Git
+.git
+.gitignore
+
+# Node.js (frontend)
+app-frontend/node_modules
+app-frontend/dist
+app-frontend/.env
+app-frontend/.env.local
+app-frontend/.env.production
+
+# .NET
+app-backend/**/bin
+app-backend/**/obj
+app-backend/**/*.db
+app-backend/**/*.db-shm
+app-backend/**/*.db-wal
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+*.md
+.github
+
+# Build artifacts
+dist
+build 
