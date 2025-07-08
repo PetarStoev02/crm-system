@@ -18,12 +18,23 @@ export function TaskForm({ task, onSubmit, onCancel }: TaskFormProps) {
   const [leads, setLeads] = useState<Array<{ id: number; name: string }>>([]);
   const [campaigns, setCampaigns] = useState<Array<{ id: number; name: string }>>([]);
   
+  // Helper function to format date for HTML date input
+  const formatDateForInput = (dateString?: string) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      return date.toISOString().split('T')[0];
+    } catch {
+      return '';
+    }
+  };
+
   const [formData, setFormData] = useState({
     title: task?.title || '',
     description: task?.description || '',
     status: task?.status || 'Pending',
     priority: task?.priority || 'Medium',
-    dueDate: task?.dueDate ? task.dueDate.split('T')[0] : '',
+    dueDate: formatDateForInput(task?.dueDate),
     relatedLeadId: task?.relatedLeadId || '',
     relatedCampaignId: task?.relatedCampaignId || ''
   });
@@ -64,12 +75,21 @@ export function TaskForm({ task, onSubmit, onCancel }: TaskFormProps) {
     setError(null);
 
     try {
+      // Convert date string to ISO string for backend
+      let dueDate: string | undefined = undefined;
+      if (formData.dueDate) {
+        const date = new Date(formData.dueDate);
+        if (!isNaN(date.getTime())) {
+          dueDate = date.toISOString();
+        }
+      }
+
       const taskData = {
         title: formData.title.trim(),
         description: formData.description.trim() || undefined,
         status: formData.status,
         priority: formData.priority,
-        dueDate: formData.dueDate || undefined,
+        dueDate: dueDate,
         relatedLeadId: formData.relatedLeadId ? Number(formData.relatedLeadId) : undefined,
         relatedCampaignId: formData.relatedCampaignId ? Number(formData.relatedCampaignId) : undefined
       };

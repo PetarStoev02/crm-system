@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using CrmSystem.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,8 +66,15 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Add controllers
-builder.Services.AddControllers();
+// Add controllers with JSON configuration
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        options.JsonSerializerOptions.Converters.Add(new DateTimeJsonConverter());
+        options.JsonSerializerOptions.Converters.Add(new NullableDateTimeJsonConverter());
+    });
 
 // Add application services
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -198,28 +208,6 @@ static async Task SeedDatabase(IServiceProvider services)
                         AssignedToUserId = user.Id,
                         CreatedByUserId = user.Id,
                         CreatedAt = DateTime.UtcNow.AddDays(-7)
-                    },
-                    new CrmSystem.Core.Entities.Task
-                    {
-                        Title = "Update social media calendar",
-                        Description = "Plan content for next month's social media posts",
-                        Status = "Pending",
-                        Priority = "Low",
-                        DueDate = DateTime.UtcNow.AddDays(12),
-                        AssignedToUserId = user.Id,
-                        CreatedByUserId = user.Id,
-                        CreatedAt = DateTime.UtcNow
-                    },
-                    new CrmSystem.Core.Entities.Task
-                    {
-                        Title = "Database backup maintenance",
-                        Description = "Perform monthly database backup and verification",
-                        Status = "Pending",
-                        Priority = "High",
-                        DueDate = DateTime.UtcNow.AddDays(-1), // Overdue task
-                        AssignedToUserId = user.Id,
-                        CreatedByUserId = user.Id,
-                        CreatedAt = DateTime.UtcNow.AddDays(-5)
                     }
                 };
 
@@ -228,15 +216,5 @@ static async Task SeedDatabase(IServiceProvider services)
                 Console.WriteLine("Sample tasks created successfully");
             }
         }
-        else
-        {
-            Console.WriteLine("Failed to create default user:");
-            foreach (var error in result.Errors)
-            {
-                Console.WriteLine($"  - {error.Description}");
-            }
-        }
     }
-
-    return;
 }
