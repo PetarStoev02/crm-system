@@ -49,6 +49,13 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: './app-frontend/dist'
+          
+      - name: Show build output
+        run: |
+          echo "Build completed. Contents of dist folder:"
+          ls -la app-frontend/dist/
+          echo "Contents of index.html:"
+          head -10 app-frontend/dist/index.html
 
   deploy:
     environment:
