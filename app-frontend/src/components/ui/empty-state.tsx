@@ -1,26 +1,23 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { type Icon } from 'lucide-react';
+import { type LucideIcon } from 'lucide-react';
 
 interface EmptyStateProps {
-  icon?: Icon;
   title: string;
   description: string;
+  icon?: LucideIcon;
+  action?: React.ReactNode;
   actionLabel?: string;
   onAction?: () => void;
   size?: 'sm' | 'md' | 'lg';
-  className?: string;
 }
 
-export function EmptyState({
-  icon: Icon,
-  title,
-  description,
-  actionLabel,
+export function EmptyState({ 
+  title, 
+  description, 
+  icon: Icon, 
+  action, 
+  actionLabel, 
   onAction,
-  size = 'md',
-  className = ''
+  size = 'md' 
 }: EmptyStateProps) {
   const sizeClasses = {
     sm: 'py-6',
@@ -35,37 +32,36 @@ export function EmptyState({
   };
 
   return (
-    <Card className={`border-dashed ${className}`}>
-      <CardContent className={`flex flex-col items-center justify-center text-center ${sizeClasses[size]}`}>
-        {Icon && (
-          <div className="mb-4">
-            <Icon className={`${iconSizes[size]} text-gray-400`} />
-          </div>
-        )}
-        
-        <h3 className={`font-semibold text-gray-900 mb-2 ${
-          size === 'lg' ? 'text-xl' : size === 'md' ? 'text-lg' : 'text-base'
-        }`}>
-          {title}
-        </h3>
-        
-        <p className={`text-gray-500 mb-4 max-w-sm ${
-          size === 'lg' ? 'text-base' : 'text-sm'
-        }`}>
-          {description}
-        </p>
-        
-        {actionLabel && onAction && (
-          <Button 
-            onClick={onAction}
-            variant="outline"
-            size={size === 'lg' ? 'default' : 'sm'}
-          >
-            {actionLabel}
-          </Button>
-        )}
-      </CardContent>
-    </Card>
+    <div className={`flex flex-col items-center justify-center text-center ${sizeClasses[size]}`}>
+      {Icon && (
+        <div className="mb-4">
+          <Icon className={`${iconSizes[size]} text-gray-400`} />
+        </div>
+      )}
+      
+      <h3 className={`font-semibold text-gray-900 mb-2 ${
+        size === 'lg' ? 'text-xl' : size === 'md' ? 'text-lg' : 'text-base'
+      }`}>
+        {title}
+      </h3>
+      
+      <p className={`text-gray-500 mb-4 max-w-sm ${
+        size === 'lg' ? 'text-base' : 'text-sm'
+      }`}>
+        {description}
+      </p>
+      
+      {action && <div className="flex justify-center">{action}</div>}
+      
+      {actionLabel && onAction && (
+        <button 
+          onClick={onAction}
+          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          {actionLabel}
+        </button>
+      )}
+    </div>
   );
 }
 

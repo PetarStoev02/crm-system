@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Users, Search, UserPlus } from 'lucide-react';
 import { clientsAPI, type Client, type ClientsResponse, type ClientStats, type CreateClientRequest } from '@/lib/clients-api';
 import { ClientForm } from './client-form';

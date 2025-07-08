@@ -217,15 +217,4 @@ class CommunicationsAPI {
   }
 }
 
-export const communicationsAPI = new CommunicationsAPI();
-
-// Explicit re-exports to ensure they're available
-export type {
-  Communication,
-  CreateCommunicationRequest,
-  UpdateCommunicationRequest,
-  CommunicationStats,
-  CommunicationsResponse,
-  GetCommunicationsParams,
-  FollowUp
-}; 
+export const communicationsAPI = new CommunicationsAPI(); 

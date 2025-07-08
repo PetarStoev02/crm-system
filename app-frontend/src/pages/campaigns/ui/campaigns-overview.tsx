@@ -38,7 +38,6 @@ export function CampaignsOverview() {
     page: 1,
     limit: 10
   });
-  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     fetchCampaigns();
@@ -51,10 +50,8 @@ export function CampaignsOverview() {
       setError(null);
       const response = await campaignsAPI.getCampaigns(filters);
       setCampaigns(response.campaigns);
-      setTotalPages(response.totalPages);
-    } catch (err: unknown) {
+    } catch {
       setError('Failed to load campaigns');
-      console.error('Error fetching campaigns:', err);
     } finally {
       setLoading(false);
     }
@@ -64,8 +61,8 @@ export function CampaignsOverview() {
     try {
       const statsData = await campaignsAPI.getCampaignStats();
       setStats(statsData);
-    } catch (err) {
-      console.error('Error fetching campaign stats:', err);
+    } catch {
+      console.error('Error fetching campaign stats:');
     }
   };
 
@@ -77,9 +74,8 @@ export function CampaignsOverview() {
       fetchCampaigns();
       fetchStats();
       toast.success('Campaign created successfully!');
-    } catch (err) {
+    } catch {
       toast.error('Failed to create campaign');
-      throw err;
     }
   };
 
@@ -93,9 +89,8 @@ export function CampaignsOverview() {
       fetchCampaigns();
       fetchStats();
       toast.success('Campaign updated successfully!');
-    } catch (err) {
+    } catch {
       toast.error('Failed to update campaign');
-      throw err;
     }
   };
 
@@ -107,7 +102,7 @@ export function CampaignsOverview() {
       fetchCampaigns();
       fetchStats();
       toast.success('Campaign deleted successfully!');
-    } catch (err) {
+    } catch {
       toast.error('Failed to delete campaign');
     }
   };

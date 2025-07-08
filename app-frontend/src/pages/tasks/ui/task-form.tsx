@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Calendar, User } from "lucide-react";
+import { ArrowLeft, Calendar } from "lucide-react";
 import { tasksAPI, type Task, type CreateTaskRequest, type UpdateTaskRequest } from "@/lib/tasks-api";
 
 interface TaskFormProps {

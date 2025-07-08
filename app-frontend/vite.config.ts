@@ -20,4 +20,12 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+
+  // GitHub Pages configuration
+  base: process.env.NODE_ENV === 'production' ? '/crm-system/' : '/',
+  
+  build: {
+    outDir: 'dist',
+    sourcemap: false,
+  },
 });

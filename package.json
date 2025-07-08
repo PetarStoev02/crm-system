@@ -8,7 +8,12 @@
     "start:backend": "cd app-backend/CrmSystem.Api && dotnet run",
     "install:frontend": "cd app-frontend && pnpm install",
     "build:frontend": "cd app-frontend && pnpm run build",
-    "lint:frontend": "cd app-frontend && pnpm run lint"
+    "build": "cd app-frontend && pnpm run build",
+    "lint:frontend": "cd app-frontend && pnpm run lint",
+    "dev": "concurrently \"npm run start:backend\" \"npm run start:frontend\""
   },
-  "packageManager": "pnpm@10.12.1+sha512.f0dda8580f0ee9481c5c79a1d927b9164f2c478e90992ad268bbb2465a736984391d6333d2c327913578b2804af33474ca554ba29c04a8b13060a717675ae3ac"
+  "packageManager": "pnpm@10.12.1+sha512.f0dda8580f0ee9481c5c79a1d927b9164f2c478e90992ad268bbb2465a736984391d6333d2c327913578b2804af33474ca554ba29c04a8b13060a717675ae3ac",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
 } 
