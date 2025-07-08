@@ -10,7 +10,7 @@ const getApiBaseUrl = () => {
       window.location.hostname.includes('github.io')) {
     // For GitHub Pages, you'll need to deploy your backend separately
     // You can use services like Railway, Render, or Azure
-    return 'https://your-backend-url.railway.app'; // Replace with your actual backend URL
+    return 'https://crm-system-production-5517.up.railway.app'; // Railway backend URL
   }
   
   // Production environment
