@@ -123,7 +123,6 @@ secrets.json
 node_modules/
 # Only ignore lock files in root, not in subdirectories
 /pnpm-lock.yaml
-/package-lock.json
 /yarn.lock
 .pnpm-debug.log*
 
