@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "start": "cd app-frontend && pnpm start",
+    "start": "concurrently \"dotnet run --project app-backend/CrmSystem.Api\" \"pnpm --filter ./app-frontend dev\"",
     "start:frontend": "cd app-frontend && pnpm run dev",
     "start:backend": "cd app-backend/CrmSystem.Api && dotnet run",
     "install:frontend": "cd app-frontend && pnpm install",

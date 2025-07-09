@@ -20,6 +20,11 @@ if (!string.IsNullOrEmpty(port))
 {
     builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 }
+else
+{
+    // For development, use localhost
+    builder.WebHost.UseUrls("http://localhost:5153");
+}
 
 // Add services to the container
 builder.Services.AddDbContext<AppDbContext>(options =>
