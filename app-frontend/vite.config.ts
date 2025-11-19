@@ -4,7 +4,7 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     tanstackRouter({
       target: 'react',
@@ -21,11 +21,11 @@ export default defineConfig({
     },
   },
 
-  // GitHub Pages configuration
-  base: import.meta.env.PROD ? '/crm-system/' : '/',
+  // GitHub Pages configuration - use production base path for builds
+  base: mode === 'production' ? '/crm-system/' : '/',
   
   build: {
     outDir: 'dist',
     sourcemap: false,
   },
-});
+}));
