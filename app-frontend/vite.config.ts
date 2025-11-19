@@ -22,7 +22,7 @@ export default defineConfig({
   },
 
   // GitHub Pages configuration
-  base: process.env.NODE_ENV === 'production' ? '/crm-system/' : '/',
+  base: import.meta.env.PROD ? '/crm-system/' : '/',
   
   build: {
     outDir: 'dist',

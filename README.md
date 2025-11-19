@@ -1,6 +1,8 @@
 # CRM System
 
-A modern, full-stack CRM system built with React, TypeScript, and .NET Core.
+A modern, full-stack Customer Relationship Management (CRM) system built with React, TypeScript, and .NET Core. Manage leads, clients, tasks, campaigns, and communications all in one powerful platform.
+
+🌐 **Live Demo:** [https://petarstoev02.github.io/crm-system/](https://petarstoev02.github.io/crm-system/)
 
 ## 🚀 Features
 
@@ -70,13 +72,18 @@ A modern, full-stack CRM system built with React, TypeScript, and .NET Core.
 
 ### Frontend (GitHub Pages)
 
-The frontend is automatically deployed to GitHub Pages when you push to the `main` branch.
+The frontend is automatically deployed to GitHub Pages when you push to the `main` branch using GitHub Actions.
 
-1. **Enable GitHub Pages** in your repository settings
-2. **Set the source** to "GitHub Actions"
-3. **Push your changes** to trigger deployment
+**Live Site:** [https://petarstoev02.github.io/crm-system/](https://petarstoev02.github.io/crm-system/)
 
-The site will be available at: `https://petarstoev02.github.io/crm-system/`
+**Setup Instructions:**
+1. **Enable GitHub Pages** in your repository settings:
+   - Go to Settings → Pages
+   - Set Source to "GitHub Actions"
+2. **Push your changes** to the `main` branch to trigger automatic deployment
+3. The workflow (`.github/workflows/pages.yml`) will build and deploy the frontend automatically
+
+**Note:** The frontend connects to a backend API. Make sure your backend is deployed and the API URL is configured in `app-frontend/src/lib/config.ts`.
 
 ### Backend Deployment
 
@@ -174,9 +181,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 If you encounter any issues:
 
-1. Check the [Issues](https://github.com/yourusername/crm-system/issues) page
+1. Check the [Issues](https://github.com/petarstoev02/crm-system/issues) page
 2. Create a new issue with detailed information
 3. Include steps to reproduce the problem
+
+## 📚 Additional Documentation
+
+- [Backend Deployment Guide](BACKEND_DEPLOYMENT.md) - Detailed backend deployment instructions
+- [Railway Deployment Guide](RAILWAY_DEPLOYMENT.md) - Step-by-step Railway deployment
+- [Leads System Guide](LEADS_SYSTEM_GUIDE.md) - Guide to using the leads management system
+- [General Deployment Guide](DEPLOYMENT.md) - Comprehensive deployment documentation
 
 ## 🚀 Quick Start
 
